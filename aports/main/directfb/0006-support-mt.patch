@@ -1,0 +1,67 @@
+--- a/inputdrivers/tslib/tslib.c
++++ b/inputdrivers/tslib/tslib.c
+@@ -71,13 +71,13 @@ static void *
+ tslibEventThread( DirectThread *thread, void *driver_data )
+ {
+      tslibData *data = (tslibData *) driver_data;
+-     struct ts_sample ts_event;
++     struct ts_sample_mt *ts_event;
+      int readlen;
+      int old_x = -1;
+      int old_y = -1;
+      unsigned int old_pressure = 0;
+ 
+-     while ((readlen = ts_read( data->ts, &ts_event, 1 )) >= 0) {
++     while ((readlen = ts_read_mt( data->ts, &ts_event, 1, 1 )) >= 0) {
+           DFBInputEvent evt;
+ 
+           direct_thread_testcancel( thread );
+@@ -85,38 +85,38 @@ tslibEventThread( DirectThread *thread, void *driver_data )
+           if (readlen < 1)
+                continue;
+ 
+-          if (ts_event.pressure) {
+-               if (ts_event.x != old_x) {
++          if (ts_event->pressure) {
++               if (ts_event->x != old_x) {
+                     evt.type    = DIET_AXISMOTION;
+                     evt.flags   = DIEF_AXISABS;
+                     evt.axis    = DIAI_X;
+-                    evt.axisabs = ts_event.x;
++                    evt.axisabs = ts_event->x;
+ 
+                     dfb_input_dispatch( data->device, &evt );
+ 
+-                    old_x = ts_event.x;
++                    old_x = ts_event->x;
+                }
+ 
+-               if (ts_event.y != old_y) {
++               if (ts_event->y != old_y) {
+                     evt.type    = DIET_AXISMOTION;
+                     evt.flags   = DIEF_AXISABS;
+                     evt.axis    = DIAI_Y;
+-                    evt.axisabs = ts_event.y;
++                    evt.axisabs = ts_event->y;
+ 
+                     dfb_input_dispatch( data->device, &evt );
+ 
+-                    old_y = ts_event.y;
++                    old_y = ts_event->y;
+                }
+           }
+ 
+-          if (!ts_event.pressure != !old_pressure) {
+-               evt.type   = ts_event.pressure ? DIET_BUTTONPRESS : DIET_BUTTONRELEASE;
++          if (!ts_event->pressure != !old_pressure) {
++               evt.type   = ts_event->pressure ? DIET_BUTTONPRESS : DIET_BUTTONRELEASE;
+                evt.flags  = DIEF_NONE;
+                evt.button = DIBI_LEFT;
+ 
+                dfb_input_dispatch( data->device, &evt );
+ 
+-               old_pressure = ts_event.pressure;
++               old_pressure = ts_event->pressure;
+           }
+      }
+ 

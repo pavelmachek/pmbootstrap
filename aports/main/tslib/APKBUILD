@@ -23,4 +23,4 @@ package() {
     cd $srcdir/$pkgname-master
     make DESTDIR="$pkgdir" install
 }
-sha512sums="9216f223d9d871977552223617a2456f438ef7e27ebafdb4e1b5944f01d8c458baa524ccaa357a76176c02c150511c225ccc799c4b00bfc741ed6e5f9d64d4be  tslib-1.13-rc0-0.tar.gz"
+sha512sums="6c23369a3465b533f0cf1525b0ef7d9bda5eae04e9c59e09e40e6aea862d3c4cf55420e35b640098e59ab09115b810ab21d41d949f46e7ab2532c5c8f526324a  tslib-1.13-rc0-0.tar.gz"

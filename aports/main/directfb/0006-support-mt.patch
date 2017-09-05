@@ -1,22 +1,27 @@
 --- a/inputdrivers/tslib/tslib.c
 +++ b/inputdrivers/tslib/tslib.c
-@@ -71,13 +71,13 @@ static void *
+@@ -71,13 +71,18 @@ static void *
  tslibEventThread( DirectThread *thread, void *driver_data )
  {
       tslibData *data = (tslibData *) driver_data;
 -     struct ts_sample ts_event;
-+     struct ts_sample_mt *ts_event;
++     struct ts_sample_mt *ts_event = NULL;
       int readlen;
       int old_x = -1;
       int old_y = -1;
       unsigned int old_pressure = 0;
  
 -     while ((readlen = ts_read( data->ts, &ts_event, 1 )) >= 0) {
++     ts_event = malloc(sizeof(struct ts_sample_mt *));
++     if (!ts_event)
++	     return;
++
++
 +     while ((readlen = ts_read_mt( data->ts, &ts_event, 1, 1 )) >= 0) {
            DFBInputEvent evt;
  
            direct_thread_testcancel( thread );
-@@ -85,38 +85,38 @@ tslibEventThread( DirectThread *thread, void *driver_data )
+@@ -85,38 +90,38 @@ tslibEventThread( DirectThread *thread, void *driver_data )
            if (readlen < 1)
                 continue;
  

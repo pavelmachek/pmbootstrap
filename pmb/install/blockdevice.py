@@ -16,9 +16,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with pmbootstrap.  If not, see <http://www.gnu.org/licenses/>.
 """
-import logging
-import os
 import glob
+import logging
+import time
+import os
+
 import pmb.helpers.mount
 import pmb.install.losetup
 import pmb.helpers.cli
@@ -44,6 +46,23 @@ def mount_sdcard(args):
     logging.info("(native) mount /dev/install (host: " + args.sdcard + ")")
     pmb.helpers.mount.bind_blockdevice(args, args.sdcard,
                                        args.work + "/chroot_native/dev/install")
+
+
+def wait_for_image_file(path):
+    """
+    Workaround for #501: File does not exist directly after running truncate.
+    This function tries to find it for 2 seconds, then gives up.
+
+    :param path: to the installation image.
+    """
+    tries = 20
+    for i in range(tries):
+        if os.path.exists(path):
+            return
+        logging.debug("NOTE: (" + str(i + 1) + "/" + str(tries) + ") failed to"
+                      " find '" + path + "'. Retrying...")
+        time.sleep(0.1)
+    raise RuntimeError("Failed to create file: " + path)
 
 
 def create_and_mount_image(args, size):
@@ -78,6 +97,7 @@ def create_and_mount_image(args, size):
     # Create empty image file
     pmb.chroot.user(args, ["mkdir", "-p", "/home/user/rootfs"])
     pmb.chroot.root(args, ["truncate", "-s", mb, img_path])
+    wait_for_image_file(img_path_outside)
 
     # Mount to /dev/install
     logging.info("(native) mount /dev/install (" + args.device + ".img)")

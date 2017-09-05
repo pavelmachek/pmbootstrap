@@ -1,72 +1,142 @@
 --- a/inputdrivers/tslib/tslib.c
 +++ b/inputdrivers/tslib/tslib.c
-@@ -71,13 +71,18 @@ static void *
+@@ -60,9 +60,12 @@ typedef struct {
+      CoreInputDevice *device;
+      DirectThread    *thread;
+      struct tsdev    *ts;
++     struct ts_sample_mt **ts_events;
+ } tslibData;
+ 
+ #define MAX_TSLIB_DEVICES 16
++#define TSLIB_SLOTS 1
++#define TSLIB_SAMPLES 1
+ 
+ static int num_devices = 0;
+ static char *device_names[MAX_TSLIB_DEVICES];
+@@ -71,58 +74,67 @@ static void *
  tslibEventThread( DirectThread *thread, void *driver_data )
  {
       tslibData *data = (tslibData *) driver_data;
 -     struct ts_sample ts_event;
-+     struct ts_sample_mt *ts_event = NULL;
       int readlen;
       int old_x = -1;
       int old_y = -1;
       unsigned int old_pressure = 0;
  
 -     while ((readlen = ts_read( data->ts, &ts_event, 1 )) >= 0) {
-+     ts_event = malloc(sizeof(struct ts_sample_mt *));
-+     if (!ts_event)
-+	     return;
-+
-+
-+     while ((readlen = ts_read_mt( data->ts, &ts_event, 1, 1 )) >= 0) {
-           DFBInputEvent evt;
+-          DFBInputEvent evt;
  
++     while ((readlen = ts_read_mt( data->ts, data->ts_events, TSLIB_SLOTS, TSLIB_SAMPLES )) >= 0) {
++          DFBInputEvent evt;
++	  int i, j;
            direct_thread_testcancel( thread );
-@@ -85,38 +90,38 @@ tslibEventThread( DirectThread *thread, void *driver_data )
+ 
            if (readlen < 1)
                 continue;
  
 -          if (ts_event.pressure) {
 -               if (ts_event.x != old_x) {
-+          if (ts_event->pressure) {
-+               if (ts_event->x != old_x) {
-                     evt.type    = DIET_AXISMOTION;
-                     evt.flags   = DIEF_AXISABS;
-                     evt.axis    = DIAI_X;
+-                    evt.type    = DIET_AXISMOTION;
+-                    evt.flags   = DIEF_AXISABS;
+-                    evt.axis    = DIAI_X;
 -                    evt.axisabs = ts_event.x;
-+                    evt.axisabs = ts_event->x;
++          for (i = 0; i < readlen; i++){
++               for (j = 0; j < TSLIB_SLOTS; j++){
++                    if (data->ts_events[i][j].valid != 1)
++                         continue;
  
-                     dfb_input_dispatch( data->device, &evt );
+-                    dfb_input_dispatch( data->device, &evt );
++                    if (data->ts_events[i][j].pressure) {
++                         if (data->ts_events[i][j].x != old_x) {
++                              evt.type    = DIET_AXISMOTION;
++                              evt.flags   = DIEF_AXISABS;
++                              evt.axis    = DIAI_X;
++                              evt.axisabs = data->ts_events[i][j].x;
  
 -                    old_x = ts_event.x;
-+                    old_x = ts_event->x;
-                }
+-               }
++                              dfb_input_dispatch( data->device, &evt );
  
 -               if (ts_event.y != old_y) {
-+               if (ts_event->y != old_y) {
-                     evt.type    = DIET_AXISMOTION;
-                     evt.flags   = DIEF_AXISABS;
-                     evt.axis    = DIAI_Y;
+-                    evt.type    = DIET_AXISMOTION;
+-                    evt.flags   = DIEF_AXISABS;
+-                    evt.axis    = DIAI_Y;
 -                    evt.axisabs = ts_event.y;
-+                    evt.axisabs = ts_event->y;
++                              old_x = data->ts_events[i][j].x;
++                         }
  
-                     dfb_input_dispatch( data->device, &evt );
+-                    dfb_input_dispatch( data->device, &evt );
++                         if (data->ts_events[i][j].y != old_y) {
++                              evt.type    = DIET_AXISMOTION;
++                              evt.flags   = DIEF_AXISABS;
++                              evt.axis    = DIAI_Y;
++                              evt.axisabs = data->ts_events[i][j].y;
  
 -                    old_y = ts_event.y;
-+                    old_y = ts_event->y;
-                }
-           }
+-               }
+-          }
++                              dfb_input_dispatch( data->device, &evt );
++
++                              old_y = data->ts_events[i][j].y;
++                         }
++                    }
  
 -          if (!ts_event.pressure != !old_pressure) {
 -               evt.type   = ts_event.pressure ? DIET_BUTTONPRESS : DIET_BUTTONRELEASE;
-+          if (!ts_event->pressure != !old_pressure) {
-+               evt.type   = ts_event->pressure ? DIET_BUTTONPRESS : DIET_BUTTONRELEASE;
-                evt.flags  = DIEF_NONE;
-                evt.button = DIBI_LEFT;
+-               evt.flags  = DIEF_NONE;
+-               evt.button = DIBI_LEFT;
++                    if (!data->ts_events[i][j].pressure != !old_pressure) {
++                         evt.type   = data->ts_events[i][j].pressure ? DIET_BUTTONPRESS : DIET_BUTTONRELEASE;
++                         evt.flags  = DIEF_NONE;
++                         evt.button = DIBI_LEFT;
  
-                dfb_input_dispatch( data->device, &evt );
+-               dfb_input_dispatch( data->device, &evt );
++                         dfb_input_dispatch( data->device, &evt );
  
 -               old_pressure = ts_event.pressure;
-+               old_pressure = ts_event->pressure;
++                         old_pressure = data->ts_events[i][j].pressure;
++                    }
++               }
            }
       }
+ 
+      if (readlen < 0)
+           D_ERROR( "tslib Input thread died\n" );
+ 
++     free(data->ts_events);
++     ts_close(data->ts);
+      return NULL;
+ }
+ 
+@@ -218,6 +230,7 @@ driver_open_device( CoreInputDevice  *device,
+ {
+      tslibData *data;
+      struct tsdev *ts;
++     int i;
+ 
+      /* open device */
+      ts = ts_open( device_names[number], 0 );
+@@ -257,6 +270,23 @@ driver_open_device( CoreInputDevice  *device,
+      data->ts     = ts;
+      data->device = device;
+ 
++     data->ts_events = malloc(TSLIB_SAMPLES * sizeof(struct ts_sample_mt *));
++     if (!data->ts_events){
++	   D_ERROR( "DirectFB/tslib: Error allocating event struct for '%s'!\n", device_names[number] );
++	   ts_close(ts);
++	   return DFB_INIT;
++     }
++
++     for (i = 0; i < TSLIB_SAMPLES; i++){
++	   data->ts_events[i] = calloc(TSLIB_SLOTS, sizeof(struct ts_sample_mt));
++	   if (!data->ts_events[i]) {
++	        D_ERROR( "DirectFB/tslib: Error allocating event struct for '%s'!\n", device_names[number] );
++	        free(data->ts_events);
++		ts_close(ts);
++	        return DFB_INIT;
++	   }
++     }
++
+      /* start input thread */
+      data->thread = direct_thread_create( DTT_INPUT, tslibEventThread, data, "tslib Input" );
  

@@ -97,11 +97,6 @@ bat = Battery()
 while 1:
     bat.run()
     s = bat.summary()
-# Battery 3.14V 3.23V 3.33V 0% 0% 35% 632/1797 mAh Not charging -454/650/100 mA
-# Battery 3.16V 3.19V 3.34V 0% 0% 6% 111/1797 mAh Not charging -423/650/100 mA
-# Battery 2.94V 3.04V 3.13V 0% 0% 5% 97/1797 mAh Not charging -454/650/100 mA
-# Battery 2.88V 2.98V 3.09V 0% 0% 5% 96/1797 mAh Not charging -481/650/100 mA
-# Battery 2.88V 2.96V 3.08V 0% 0% 5% 93/1797 mAh Not charging -476/650/100 mA
 # Battery 2.82V 2.90V 3.04V 0% 0% 5% 91/1797 mAh Not charging -511/650/100 mA
     if bat.volt < 2.95:
         os.system("/sbin/shutdown -h now")

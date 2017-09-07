@@ -5,12 +5,14 @@ pkgdesc="Battery monitoring daemon"
 url="https://github.org/postmarketOS"
 arch="noarch"
 license="GPL"
+depends=""
+makedepends=""
 subpackages=""
-source="batmond"
+source="batmond.py"
 options=""
 
 package() {
 	install -D -m755 "$srcdir"/batmond.py \
 		"$pkgdir"/usr/bin/batmond || return 1
 }
-sha512sums="a5c25ab16c0d98749b9cce8f347b115b44522c1d791e0ffcd248c65d25343936a542ea6b8af81a3d2e4f17e7ab9403ec44b5af679129bf0ed880dd4c5bcf7139  batmond.py"
+sha512sums="b604cb125b2245b41141a6424579ff9c48c9339c5bf74c0dfef4d4ef65e49665c61907d16a8332aa0b59757be70e3092d9e18af32d00ac5a9434e8504fd63fb9  batmond.py"

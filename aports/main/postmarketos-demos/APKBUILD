@@ -20,5 +20,5 @@ package() {
 	install -D -m755 "$srcdir"/postmarketos-demos \
 		"$pkgdir"/usr/bin/postmarketos-demos || return 1
 }
-sha512sums="ae51469e6105dfd07e1ffb2ab3b6e2261239ca80b6e897951e7223cc8dd8fcb7c98f06f2e3870203a2f840ce4b5d425b4943ae0091631bbf48ae283d3cf1f86a  main.c
+sha512sums="9992bbe9d879b190152f09a59a7301ca7ebe334b565e2605e1aea7197af70ad6ff6b4cba28f0a91e86b5b32bfe801b0a207b6305c131ddb7062ae3269aa05b90  main.c
 83d8a95e9e1e95dffa8661e547444e83e72e572dcd0c637376f678bbd20a351c4b971a315311edefeb58a4cca14fd3e586fb581a262b2d217e25092459539b98  Makefile"

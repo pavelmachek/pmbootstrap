@@ -15,4 +15,4 @@ package() {
 	install -D -m755 "$srcdir"/batmond.py \
 		"$pkgdir"/usr/bin/batmond || return 1
 }
-sha512sums="4592d68b608f94ee0d2d71226d26a1411b245f3e5d7cc4cd49594ad7f86f5c4b47a3bca02cb98ac37fa6964cbc9b5afce9d1acf71fe1e960d8cb4c2dea5f8161  batmond.py"
+sha512sums="3ab4a3be9d1d381896f6418dede124137c6afd4a8d6b7a74331c0998c3ddaa037634085b7f8a0dc0d1a50173368b8e65219d17bc018732ab8a337dff9a5e88b8  batmond.py"

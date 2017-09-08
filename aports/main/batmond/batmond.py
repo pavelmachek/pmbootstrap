@@ -2,6 +2,7 @@
 # -*- python -*-
 import os
 import time
+import math
 
 class Test:
     def read(m, s):

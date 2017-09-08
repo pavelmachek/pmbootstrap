@@ -51,8 +51,7 @@ class Battery(Test):
             charge_now = 0
             charge_full = 0
             perc2 = 0
-        charge_design = int(
-            m.read(m.path + "/bq27200-0/charge_full_design")) / 1000
+
         volt2 = int(m.read(m.path + "/bq27200-0/voltage_now")) / 1000000.
         current2 = int(m.read(m.path + "/bq27200-0/current_now")) / 1000.
 
@@ -93,12 +92,8 @@ class Battery(Test):
             return "low"
         return "ok"
 
-    def fast_charge(m, limit=1800):
-        sy("echo %d > /sys/class/power_supply/bq24150a-0/current_limit" %
-           limit)
-        print("Fast charge on, %d mA" % limit)
-
 # os.system("setterm -blank 1")
+
 
 bat = Battery()
 while 1:

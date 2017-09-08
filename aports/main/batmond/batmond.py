@@ -4,12 +4,15 @@ import os
 import time
 import math
 
+
 class Test:
+
     def read(m, s):
         f = open(s, "r")
         r = f.read()
         f.close()
         return r
+
 
 class Battery(Test):
     hotkey = "b"
@@ -17,39 +20,41 @@ class Battery(Test):
     path = "/sys/class/power_supply"
 
     def percent(m, v):
-        u = 0.0387-(1.4523*(3.7835-v))
+        u = 0.0387 - (1.4523 * (3.7835 - v))
         if u < 0:
             return 0
-        return (0.1966+math.sqrt(u))*100
+        return (0.1966 + math.sqrt(u)) * 100
 
     def run(m):
         try:
             # On new kernels
-            volt = int(m.read(m.path+"/rx51-battery/voltage_now"))
+            volt = int(m.read(m.path + "/rx51-battery/voltage_now"))
         except:
             # On 4.1
-            volt = int(m.read(m.path+"/n900-battery/voltage_now"))
+            volt = int(m.read(m.path + "/n900-battery/voltage_now"))
         volt /= 1000000.
         perc = m.percent(volt)
-        
-        status = m.read(m.path+"/bq24150a-0/status")[:-1]
-        current = int(m.read(m.path+"/bq24150a-0/charge_current"))
-        limit = int(m.read(m.path+"/bq24150a-0/current_limit"))
+
+        status = m.read(m.path + "/bq24150a-0/status")[:-1]
+        current = int(m.read(m.path + "/bq24150a-0/charge_current"))
+        limit = int(m.read(m.path + "/bq24150a-0/current_limit"))
 
         try:
-            charge_now = int(m.read(m.path+"/bq27200-0/charge_now")) / 1000
-            charge_full = int(m.read(m.path+"/bq27200-0/charge_full")) / 1000
-            #perc2 = int(m.read(m.path+"/bq27200-0/capacity"))
+            charge_now = int(m.read(m.path + "/bq27200-0/charge_now")) / 1000
+            charge_full = int(m.read(m.path + "/bq27200-0/charge_full")) / 1000
+            # perc2 = int(m.read(m.path+"/bq27200-0/capacity"))
             # Buggy in v4.4
             perc2 = int((charge_now * 100.) / charge_full)
         except:
-            # bq27x00-battery 2-0055: battery is not calibrated! ignoring capacity values
+            # bq27x00-battery 2-0055: battery is not calibrated! ignoring
+            # capacity values
             charge_now = 0
             charge_full = 0
             perc2 = 0
-        charge_design = int(m.read(m.path+"/bq27200-0/charge_full_design")) / 1000
-        volt2 = int(m.read(m.path+"/bq27200-0/voltage_now")) / 1000000.
-        current2 = int(m.read(m.path+"/bq27200-0/current_now")) / 1000.
+        charge_design = int(
+            m.read(m.path + "/bq27200-0/charge_full_design")) / 1000
+        volt2 = int(m.read(m.path + "/bq27200-0/voltage_now")) / 1000000.
+        current2 = int(m.read(m.path + "/bq27200-0/current_now")) / 1000.
 
         # http://www.buchmann.ca/Chap9-page3.asp
         # 0.49 ohm is between "poor" and "fail".
@@ -59,11 +64,11 @@ class Battery(Test):
         volt3 = volt + (current2 / 1000. * resistance)
         perc3 = m.percent(volt3)
 
-        print("Battery %.2fV %.2fV %.2fV" % (volt, volt2, volt3), \
-              "%d%% %d%% %d%%" % (int(perc), int(perc3), perc2), \
-              "%d/%d mAh" % (charge_now, charge_full), \
-              status, \
-              "%d/%d/%d mA" % (int(-current2), current, limit) )
+        print("Battery %.2fV %.2fV %.2fV" % (volt, volt2, volt3),
+              "%d%% %d%% %d%%" % (int(perc), int(perc3), perc2),
+              "%d/%d mAh" % (charge_now, charge_full),
+              status,
+              "%d/%d/%d mA" % (int(-current2), current, limit))
         m.perc = perc
         m.perc2 = perc2
         m.perc3 = perc3
@@ -89,10 +94,11 @@ class Battery(Test):
         return "ok"
 
     def fast_charge(m, limit=1800):
-        sy("echo %d > /sys/class/power_supply/bq24150a-0/current_limit" % limit)
+        sy("echo %d > /sys/class/power_supply/bq24150a-0/current_limit" %
+           limit)
         print("Fast charge on, %d mA" % limit)
 
-#os.system("setterm -blank 1")
+# os.system("setterm -blank 1")
 
 bat = Battery()
 while 1:

@@ -179,8 +179,9 @@ deviceinfo_attributes = [
     # flash
     "generate_bootimg",
     "generate_legacy_uboot_initfs",
-    "flash_heimdall_partition_initfs",
     "flash_heimdall_partition_kernel",
+    "flash_heimdall_partition_initfs",
+    "flash_heimdall_partition_system",
     "flash_offset_base",
     "flash_offset_kernel",
     "flash_offset_ramdisk",
@@ -241,6 +242,7 @@ Flasher abstraction. Allowed variables:
 $BOOT: Path to the /boot partition
 $FLAVOR: Kernel flavor
 $IMAGE: Path to the system partition image
+$PARTITION_SYSTEM: Partition to flash the system image
 
 Fastboot specific: $KERNEL_CMDLINE
 Heimdall specific: $PARTITION_KERNEL, $PARTITION_INITFS
@@ -251,7 +253,7 @@ flashers = {
         "actions":
                 {
                     "list_devices": [["fastboot", "devices", "-l"]],
-                    "flash_system": [["fastboot", "flash", "system", "$IMAGE"]],
+                    "flash_system": [["fastboot", "flash", "$PARTITION_SYSTEM", "$IMAGE"]],
                     "flash_kernel": [["fastboot", "flash", "boot", "$BOOT/boot.img-$FLAVOR"]],
                     "boot": [["fastboot", "-c", "$KERNEL_CMDLINE", "boot", "$BOOT/boot.img-$FLAVOR"]],
 
@@ -269,7 +271,7 @@ flashers = {
             "list_devices": [["heimdall", "detect"]],
             "flash_system": [
                 ["heimdall_wait_for_device.sh"],
-                ["heimdall", "flash", "--SYSTEM", "$IMAGE"]],
+                ["heimdall", "flash", "--$PARTITION_SYSTEM", "$IMAGE"]],
             "flash_kernel": [["heimdall_flash_kernel.sh",
                               "$BOOT/initramfs-$FLAVOR", "$PARTITION_INITFS",
                               "$BOOT/vmlinuz-$FLAVOR", "$PARTITION_KERNEL"]]
@@ -284,7 +286,7 @@ flashers = {
             "list_devices": [["heimdall", "detect"]],
             "flash_system": [
                 ["heimdall_wait_for_device.sh"],
-                ["heimdall", "flash", "--SYSTEM", "$IMAGE"]],
+                ["heimdall", "flash", "--$PARTITION_SYSTEM", "$IMAGE"]],
             "flash_kernel": [
                 ["heimdall_wait_for_device.sh"],
                 ["heimdall", "flash", "--$PARTITION_KERNEL", "$BOOT/boot.img-$FLAVOR"]],

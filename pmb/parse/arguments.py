@@ -50,8 +50,12 @@ def arguments_flasher(subparser):
     for action in [boot, flash_kernel]:
         action.add_argument("--flavor", default=None)
 
+    # Flash system
+    flash_system = sub.add_parser("flash_system", help="flash the system partition")
+    flash_system.add_argument("--partition", default=None, help="partition to flash"
+                              " the system image")
+
     # Actions without extra arguments
-    sub.add_parser("flash_system", help="flash the system partition")
     sub.add_parser("sideload", help="sideload recovery zip")
     sub.add_parser("list_flavors", help="list installed kernel flavors" +
                    " inside the device rootfs chroot on this computer")
@@ -168,6 +172,8 @@ def arguments():
     zap.add_argument("-m", "--mismatch-bins", action="store_true", help="also delete"
                      " binary packages that are newer than the corresponding"
                      " package in aports")
+    zap.add_argument("-d", "--distfiles", action="store_true", help="also delete"
+                     " downloaded files cache")
 
     # Action: stats
     stats = sub.add_parser("stats", help="show ccache stats")
@@ -231,6 +237,15 @@ def arguments():
     build.add_argument("--arch")
     build.add_argument("--force", action="store_true")
     build.add_argument("--buildinfo", action="store_true")
+    build.add_argument("--strict", action="store_true", help="(slower) zap and install only"
+                       " required depends when building, to detect dependency errors")
+    build.add_argument("--noarch-arch", dest="noarch_arch", default=None,
+                       help="which architecture to use to build 'noarch'"
+                            " packages. Defaults to the native arch normally,"
+                            " and to the device arch when --strict is set."
+                            " Override in case of strict mode failing on"
+                            " dependencies, which only exist for a certain"
+                            " arch.")
     for action in [checksum, build, aportgen]:
         action.add_argument("packages", nargs="+")
 

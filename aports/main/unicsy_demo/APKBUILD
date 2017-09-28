@@ -1,11 +1,11 @@
 pkgname=unicsy_demo
-pkgver=0.0
+pkgver=0.2
 pkgrel=0
 pkgdesc="Demo of phone functionality"
 url="https://github.com/postmarketOS/osk-sdl"
 arch="all"
 license="GPL3"
-depends=""
+depends="py-gtk-dev"
 makedepends=""
 subpackages=""
 
@@ -19,8 +19,8 @@ build() {
 
 package() {
     install -d -m755 "$pkgdir"/usr/share/unicsy/demo/
-    cp -a "${srcdir}/${pkgname}-${pkgver}"/ "$pkgdir"/usr/share/unicsy/demo/
+    cp -a "${srcdir}/${pkgname}-${pkgver}"/* "$pkgdir"/usr/share/unicsy/
 #    install -D -m755 "${srcdir}/${pkgname}-${pkgver}"/README.md \
 #        "$pkgdir"/usr/share/unicsy/demo/
 }
-sha512sums="1142f2120915fc48b198de8286c069357151db7fd5fdd170e66f5121d169bc0540b99263742387d7aa83f96e9a9fafd3e0a6c95bcbe229c414a356089bda747a  unicsy_demo-0.0-0.tar.gz"
+sha512sums="403fb82b6f6a9d37b195ccda38dc6d4756e4124d11fbcc9f310501be5cf96488fca12a1ad0126cfa6001319750067ffdfaf8eea0fb13d144075028779bfb7c98  unicsy_demo-0.2-0.tar.gz"

@@ -18,7 +18,9 @@ build() {
 }
 
 package() {
-    install -D -m755 "${srcdir}/${pkgname}-${pkgver}"/README.md \
-        "$pkgdir"/usr/share/unicsy/demo
+    install -d -m755 "$pkgdir"/usr/share/unicsy/demo/
+    cp -a "${srcdir}/${pkgname}-${pkgver}"/ "$pkgdir"/usr/share/unicsy/demo/
+#    install -D -m755 "${srcdir}/${pkgname}-${pkgver}"/README.md \
+#        "$pkgdir"/usr/share/unicsy/demo/
 }
 sha512sums="1142f2120915fc48b198de8286c069357151db7fd5fdd170e66f5121d169bc0540b99263742387d7aa83f96e9a9fafd3e0a6c95bcbe229c414a356089bda747a  unicsy_demo-0.0-0.tar.gz"

@@ -14,12 +14,11 @@ source="${pkgname}-${pkgver}-${pkgrel}.tar.gz::https://github.com/pavelmachek/un
 options="!strip"
 
 build() {
+    echo ok
 }
 
 package() {
-    install -D -m755 "${srcdir}/${pkgname}-${pkgver}"/osk-sdl \
-        "$pkgdir"/usr/bin/osk-sdl
-    install -D -m755 "${srcdir}/${pkgname}-${pkgver}"/osk.conf \
-        "$pkgdir"/etc/osk.conf
+    install -D -m755 "${srcdir}/${pkgname}-${pkgver}"/lib \
+        "$pkgdir"/usr/share/unicsy/demo
 }
-sha512sums="ff484fd333fb420f123e8c5dd79941e390f6facfee9846fa935a0c9ea14e4ed070b28b68d9067a85277c3384e326fddc06a8defed732b58b559caedf28dad494  osk-sdl-0.48-0.tar.gz"
+sha512sums="1142f2120915fc48b198de8286c069357151db7fd5fdd170e66f5121d169bc0540b99263742387d7aa83f96e9a9fafd3e0a6c95bcbe229c414a356089bda747a  unicsy_demo-0.0-0.tar.gz"

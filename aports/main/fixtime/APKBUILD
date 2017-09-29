@@ -7,14 +7,15 @@ arch="noarch"
 license="MIT"
 depends=""
 makedepends=""
+install="$pkgname.post-install"
 subpackages=""
 source="fixtime.sh"
 options=""
 
 package() {
 	install -D -m755 "$srcdir"/fixtime.sh \
-		"$pkgdir"/usr/sbin/fixtime.sh || return 1
+		"$pkgdir"/etc/init.d/fixtime.sh || return 1
 	install -d -m755 "$pkgdir"/etc
 	date "+%s" > "$pkgdir"/etc/fixtime.time
 }
-sha512sums="31b2b0871698960c4eed9a2a72b42e9042e1537c3061092125b115dea9deb96175dd9de92d3c2fb68ea65c56aad28d2d0ad02b2acd4b494b5607c49657f23ba6  fixtime.sh"
+sha512sums="40acb75b52f49bd2f5b7708d783f89536f75e5988fb3aac16b7fe2d7d183cee25c58ca63ca307ff6870132b5ab25a81b499559ede5fd2d3a83774bb6b41456a5  fixtime.sh"

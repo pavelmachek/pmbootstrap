@@ -10,6 +10,7 @@ makedepends=""
 install="$pkgname.post-install"
 subpackages=""
 source="start_xfce4.sh xfwm4.xml xfce4-panel.xml $install"
+# g/tui/ofone/config.n900/xfce4/xfconf/xfce-perchannel-xml/
 options="!check"
 
 package() {

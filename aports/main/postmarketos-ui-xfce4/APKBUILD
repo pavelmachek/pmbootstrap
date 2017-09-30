@@ -1,0 +1,20 @@
+pkgname=postmarketos-ui-xfce4
+pkgver=0
+pkgrel=0
+pkgdesc="Meta package for xfce4"
+url="https://github.com/postmarketOS"
+arch="noarch"
+license="GPL3"
+depends="xfce4 xorg-server xf86-video-vesa xf86-input-evdev xf86-input-mouse xf86-input-keyboard udev xinput"
+makedepends=""
+install="$pkgname.post-install"
+subpackages=""
+source="start_xfce4.sh $install"
+options="!check"
+
+package() {
+	install -D -m644 "$srcdir"/start_xfce4.sh \
+		"$pkgdir"/etc/profile.d/start_xfce4.sh || return 1
+}
+sha512sums="7f834eb3abbed43ca882a4e0d470b332d985511e3a7e11a89a76bb684419d6af3641f3f69c047d71ea8fa43da4e278aa93b0398890bc8c82653054de4e010462  start_xfce4.sh
+86b0d3d83da393aafc5d17552457030d9dfae071a35dbe93125e101361962f1752575f17c7dd4140d2a5c6cd4e09367bb2226b532a0194c26c5a77899e80842f  postmarketos-ui-xfce4.post-install"

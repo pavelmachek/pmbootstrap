@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 ### BEGIN INIT INFO
 # Provides:          fixtime
@@ -14,9 +14,10 @@ F=/etc/fixtime.time
 
 case "$1" in
     start)
-	if [ $(date +%s) -lt $(< $F) ];
+	SAVED=$(cat $F)
+	if [ $(date +%s) -lt $SAVED ];
 	then
-	    date -s @$(< $F)
+	    date -s @$SAVED
 	fi
 	date +%s > $F
 	;;

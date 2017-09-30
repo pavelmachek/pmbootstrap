@@ -1,4 +1,4 @@
 #!/bin/sh
 
-rc-update -q add fixtime boot
+rc-update -q add fixtime default
 rc-update -q add fixtime shutdown

@@ -7,15 +7,17 @@ arch="noarch"
 license="MIT"
 depends=""
 makedepends=""
-install="$pkgname.post-install"
+install="$pkgname.post-install $pkgname.pre-deinstall"
 subpackages=""
-source="fixtime.sh"
+source="fixtime.sh $install"
 options=""
 
 package() {
 	install -D -m755 "$srcdir"/fixtime.sh \
-		"$pkgdir"/etc/init.d/fixtime.sh || return 1
+		"$pkgdir"/etc/init.d/fixtime || return 1
 	install -d -m755 "$pkgdir"/etc
 	date "+%s" > "$pkgdir"/etc/fixtime.time
 }
-sha512sums="40acb75b52f49bd2f5b7708d783f89536f75e5988fb3aac16b7fe2d7d183cee25c58ca63ca307ff6870132b5ab25a81b499559ede5fd2d3a83774bb6b41456a5  fixtime.sh"
+sha512sums="7b961d85382db6d313864b0003273e70b2da2035989eb067bd32c0f40e9d5c2ba927a971d1ae474ef1a8ffddfd34d778b87d3a2af961cfe69c2b7387c6846399  fixtime.sh
+c955f8cf7f68e98e37510508c6d518998aa7f54bd8b3e0d4b5a0e2943c300bd11d8aa6d04479d9c3bbf720fea8f28340cc36a71ecda3d65d8a65e97769509e62  fixtime.post-install
+7e8ad6ab90c37e0a572259d3f46438e96c1619599e5b42c146cc6d866d200478456595d8bb53b323b9ca92823415d4256f5b4920d4560d0448f44f64e28909bb  fixtime.pre-deinstall"

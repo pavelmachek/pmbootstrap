@@ -1,0 +1,4 @@
+#!/bin/sh
+
+rc-update -q del fixtime default
+rc-update -q del fixtime shutdown

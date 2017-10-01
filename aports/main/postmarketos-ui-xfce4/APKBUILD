@@ -9,19 +9,22 @@ depends="xfce4 xorg-server xf86-video-vesa xf86-input-evdev xf86-input-mouse xf8
 makedepends=""
 install="$pkgname.post-install"
 subpackages=""
-source="start_xfce4.sh $install {pkgname}-${pkgver}-${pkgrel}.tar.gz::https://github.com/pavelmachek/${pkgname}/archive/${pkgver}.tar.gz"
+source="start_xfce4.sh $install ${pkgname}-${pkgver}-${pkgrel}.tar.gz::https://github.com/pavelmachek/xfce4-phone/archive/${pkgver}.tar.gz"
 # g/tui/ofone/config.n900/xfce4/xfconf/xfce-perchannel-xml/
 options="!check"
 
 package() {
 	install -D -m644 "$srcdir"/start_xfce4.sh \
 		"$pkgdir"/etc/profile.d/start_xfce4.sh || return 1
-	USER="$pkgdir"/home/user
+	USER="$pkgdir"/home/user2
 	ASUSER="-D -m644 -o user"
-	cp -a "${srcdir}/${pkgname}-${pkgver}"/config "${USER}"/.config
-	chown -R user $USER
+	install -d -m755 "$USER"
+	install -d -m755 "$pkgdir"/etc/skel
+	cp -a "${srcdir}/xfce4-phone-${pkgver}"/config "${USER}"/.config
+	cp -a "${srcdir}/xfce4-phone-${pkgver}"/config "${USER}"/config-xfce4-phone
+	#chown -R user $USER/.config
+	cp -a "${srcdir}/xfce4-phone-${pkgver}"/config "${pkgdir}"/etc/skel/.config
 }
 sha512sums="7f834eb3abbed43ca882a4e0d470b332d985511e3a7e11a89a76bb684419d6af3641f3f69c047d71ea8fa43da4e278aa93b0398890bc8c82653054de4e010462  start_xfce4.sh
-0c08eef16d878e5fa36324676f072b8e5531cd9c2bbc62e8058ce794ca4087a23a4a52fc944aa77a26a36a03992932a0d635fa22d5ee6b5ba1d41b19daf3bc45  xfwm4.xml
-8bb83d6c3c854662e48d200e48868acf059614a6a4d708587d2efa81edd7e4977d4d835ca452f1dc45a150dd3d6ca61c3ea8c39f95df422cc82c5b29aaca3240  xfce4-panel.xml
-86b0d3d83da393aafc5d17552457030d9dfae071a35dbe93125e101361962f1752575f17c7dd4140d2a5c6cd4e09367bb2226b532a0194c26c5a77899e80842f  postmarketos-ui-xfce4.post-install"
+86b0d3d83da393aafc5d17552457030d9dfae071a35dbe93125e101361962f1752575f17c7dd4140d2a5c6cd4e09367bb2226b532a0194c26c5a77899e80842f  postmarketos-ui-xfce4.post-install
+758562d2820a11b2c96e1805e00450f78203e6fd224115c373825f041b344985490a84b74d2880b423d5606140d5ffb41e79b0a8eb3e5b9a0ce7874c4ccfb666  postmarketos-ui-xfce4-0.0-0.tar.gz"

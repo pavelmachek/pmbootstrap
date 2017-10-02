@@ -113,9 +113,10 @@ def init(args, suffix="native"):
         pmb.chroot.root(args, ["apk", "fix"], suffix,
                         auto_init=False)
 
-    # Add user (-D: don't assign password)
-    logging.debug("Add user")
-    pmb.chroot.root(args, ["adduser", "-D", "user", "-u", pmb.config.chroot_uid_user],
-                    suffix, auto_init=False)
-    pmb.chroot.root(args, ["chown", "-R", "user:user", "/home/user"],
-                    suffix)
+    if suffix == "native":
+        # Add user (-D: don't assign password)
+        logging.debug("Add user")
+        pmb.chroot.root(args, ["adduser", "-D", "user", "-u", pmb.config.chroot_uid_user],
+                        suffix, auto_init=False)
+        pmb.chroot.root(args, ["chown", "-R", "user:user", "/home/user"],
+                        suffix)

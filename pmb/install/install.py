@@ -111,6 +111,13 @@ def set_user_password(args):
     """
     logging.info(" *** SET LOGIN PASSWORD FOR: 'user' ***")
     suffix = "rootfs_" + args.device
+
+    logging.debug("Add user")
+    pmb.chroot.root(args, ["adduser", "-D", "user", "-u", pmb.config.chroot_uid_user],
+                                        suffix, auto_init=False)
+    pmb.chroot.root(args, ["chown", "-R", "user:user", "/home/user"],
+                    suffix)
+
     while True:
         try:
             pmb.chroot.root(args, ["passwd", "user"], suffix, log=False)

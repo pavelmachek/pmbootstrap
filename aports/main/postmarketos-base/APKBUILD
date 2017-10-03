@@ -40,6 +40,8 @@ package() {
 	install -D -m755 "$srcdir"/firmwareload.sh \
 		"$pkgdir"/usr/lib/firmwareload.sh
 
+	install -d -m755 "$pkgdir"/etc/skel
+
 	# Install swapfile
 	install -Dm755 "$srcdir"/swapfile \
 		"$pkgdir"/sbin/swapfile

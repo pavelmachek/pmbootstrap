@@ -192,8 +192,8 @@ state.RX51 {
 	control.14 {
 		iface MIXER
 		name 'PCM Playback Volume'
-		value.0 127
-		value.1 127
+		value.0 116
+		value.1 116
 		comment {
 			access 'read write'
 			type INTEGER
@@ -201,8 +201,8 @@ state.RX51 {
 			range '0 - 127'
 			dbmin -6350
 			dbmax 0
-			dbvalue.0 0
-			dbvalue.1 0
+			dbvalue.0 -550
+			dbvalue.1 -550
 		}
 	}
 	control.15 {
@@ -710,38 +710,6 @@ state.RX51 {
 	}
 	control.50 {
 		iface MIXER
-		name 'McBSP2 Sidetone Switch'
-		value false
-		comment {
-			access 'read write'
-			type BOOLEAN
-			count 1
-		}
-	}
-	control.51 {
-		iface MIXER
-		name 'McBSP2 Sidetone Channel 0 Volume'
-		value 0
-		comment {
-			access 'read write'
-			type INTEGER
-			count 1
-			range '-32768 - 32767'
-		}
-	}
-	control.52 {
-		iface MIXER
-		name 'McBSP2 Sidetone Channel 1 Volume'
-		value 0
-		comment {
-			access 'read write'
-			type INTEGER
-			count 1
-			range '-32768 - 32767'
-		}
-	}
-	control.53 {
-		iface MIXER
 		name 'b Left Line Mixer Line2R Bypass Volume'
 		value 118
 		comment {
@@ -754,7 +722,7 @@ state.RX51 {
 			dbvalue.0 0
 		}
 	}
-	control.54 {
+	control.51 {
 		iface MIXER
 		name 'b Right Line Mixer Line2L Bypass Volume'
 		value 118
@@ -768,7 +736,7 @@ state.RX51 {
 			dbvalue.0 0
 		}
 	}
-	control.55 {
+	control.52 {
 		iface MIXER
 		name 'b Left HP Mixer Line2R Bypass Volume'
 		value 118
@@ -782,7 +750,7 @@ state.RX51 {
 			dbvalue.0 0
 		}
 	}
-	control.56 {
+	control.53 {
 		iface MIXER
 		name 'b Right HP Mixer Line2L Bypass Volume'
 		value 118
@@ -796,7 +764,7 @@ state.RX51 {
 			dbvalue.0 0
 		}
 	}
-	control.57 {
+	control.54 {
 		iface MIXER
 		name 'b Left HPCOM Mixer Line2R Bypass Volume'
 		value 118
@@ -810,7 +778,7 @@ state.RX51 {
 			dbvalue.0 0
 		}
 	}
-	control.58 {
+	control.55 {
 		iface MIXER
 		name 'b Right HPCOM Mixer Line2L Bypass Volume'
 		value 118
@@ -824,7 +792,7 @@ state.RX51 {
 			dbvalue.0 0
 		}
 	}
-	control.59 {
+	control.56 {
 		iface MIXER
 		name 'b Line Line2 Bypass Volume'
 		value.0 71
@@ -840,7 +808,7 @@ state.RX51 {
 			dbvalue.1 -2350
 		}
 	}
-	control.60 {
+	control.57 {
 		iface MIXER
 		name 'b HP Line2 Bypass Volume'
 		value.0 71
@@ -856,7 +824,7 @@ state.RX51 {
 			dbvalue.1 -2350
 		}
 	}
-	control.61 {
+	control.58 {
 		iface MIXER
 		name 'b HPCOM Line2 Bypass Volume'
 		value.0 71
@@ -872,7 +840,7 @@ state.RX51 {
 			dbvalue.1 -2350
 		}
 	}
-	control.62 {
+	control.59 {
 		iface MIXER
 		name 'b Mono Line2 Bypass Volume'
 		value.0 71
@@ -888,7 +856,7 @@ state.RX51 {
 			dbvalue.1 -2350
 		}
 	}
-	control.63 {
+	control.60 {
 		iface MIXER
 		name 'b Mono PGA Bypass Volume'
 		value.0 71
@@ -904,7 +872,7 @@ state.RX51 {
 			dbvalue.1 -2350
 		}
 	}
-	control.64 {
+	control.61 {
 		iface MIXER
 		name 'b Mono DAC Playback Volume'
 		value.0 71
@@ -920,7 +888,7 @@ state.RX51 {
 			dbvalue.1 -2350
 		}
 	}
-	control.65 {
+	control.62 {
 		iface MIXER
 		name 'b Mono Playback Switch'
 		value true
@@ -930,7 +898,7 @@ state.RX51 {
 			count 1
 		}
 	}
-	control.66 {
+	control.63 {
 		iface MIXER
 		name 'b PCM Playback Volume'
 		value.0 80
@@ -946,7 +914,7 @@ state.RX51 {
 			dbvalue.1 -2350
 		}
 	}
-	control.67 {
+	control.64 {
 		iface MIXER
 		name 'b Left Line Mixer PGAR Bypass Volume'
 		value 118
@@ -960,7 +928,7 @@ state.RX51 {
 			dbvalue.0 0
 		}
 	}
-	control.68 {
+	control.65 {
 		iface MIXER
 		name 'b Left Line Mixer DACR1 Playback Volume'
 		value 118
@@ -974,7 +942,7 @@ state.RX51 {
 			dbvalue.0 0
 		}
 	}
-	control.69 {
+	control.66 {
 		iface MIXER
 		name 'b Right Line Mixer PGAL Bypass Volume'
 		value 118
@@ -988,7 +956,7 @@ state.RX51 {
 			dbvalue.0 0
 		}
 	}
-	control.70 {
+	control.67 {
 		iface MIXER
 		name 'b Right Line Mixer DACL1 Playback Volume'
 		value 118
@@ -1002,7 +970,7 @@ state.RX51 {
 			dbvalue.0 0
 		}
 	}
-	control.71 {
+	control.68 {
 		iface MIXER
 		name 'b Left HP Mixer PGAR Bypass Volume'
 		value 118
@@ -1016,7 +984,7 @@ state.RX51 {
 			dbvalue.0 0
 		}
 	}
-	control.72 {
+	control.69 {
 		iface MIXER
 		name 'b Left HP Mixer DACR1 Playback Volume'
 		value 118
@@ -1030,7 +998,7 @@ state.RX51 {
 			dbvalue.0 0
 		}
 	}
-	control.73 {
+	control.70 {
 		iface MIXER
 		name 'b Right HP Mixer PGAL Bypass Volume'
 		value 118
@@ -1044,7 +1012,7 @@ state.RX51 {
 			dbvalue.0 0
 		}
 	}
-	control.74 {
+	control.71 {
 		iface MIXER
 		name 'b Right HP Mixer DACL1 Playback Volume'
 		value 118
@@ -1058,7 +1026,7 @@ state.RX51 {
 			dbvalue.0 0
 		}
 	}
-	control.75 {
+	control.72 {
 		iface MIXER
 		name 'b Left HPCOM Mixer PGAR Bypass Volume'
 		value 118
@@ -1072,7 +1040,7 @@ state.RX51 {
 			dbvalue.0 0
 		}
 	}
-	control.76 {
+	control.73 {
 		iface MIXER
 		name 'b Left HPCOM Mixer DACR1 Playback Volume'
 		value 118
@@ -1086,7 +1054,7 @@ state.RX51 {
 			dbvalue.0 0
 		}
 	}
-	control.77 {
+	control.74 {
 		iface MIXER
 		name 'b Right HPCOM Mixer PGAL Bypass Volume'
 		value 118
@@ -1100,7 +1068,7 @@ state.RX51 {
 			dbvalue.0 0
 		}
 	}
-	control.78 {
+	control.75 {
 		iface MIXER
 		name 'b Right HPCOM Mixer DACL1 Playback Volume'
 		value 118
@@ -1114,7 +1082,7 @@ state.RX51 {
 			dbvalue.0 0
 		}
 	}
-	control.79 {
+	control.76 {
 		iface MIXER
 		name 'b Line PGA Bypass Volume'
 		value.0 71
@@ -1130,7 +1098,7 @@ state.RX51 {
 			dbvalue.1 -2350
 		}
 	}
-	control.80 {
+	control.77 {
 		iface MIXER
 		name 'b Line DAC Playback Volume'
 		value.0 71
@@ -1146,7 +1114,7 @@ state.RX51 {
 			dbvalue.1 -2350
 		}
 	}
-	control.81 {
+	control.78 {
 		iface MIXER
 		name 'b HP PGA Bypass Volume'
 		value.0 71
@@ -1162,7 +1130,7 @@ state.RX51 {
 			dbvalue.1 -2350
 		}
 	}
-	control.82 {
+	control.79 {
 		iface MIXER
 		name 'b HP DAC Playback Volume'
 		value.0 71
@@ -1178,7 +1146,7 @@ state.RX51 {
 			dbvalue.1 -2350
 		}
 	}
-	control.83 {
+	control.80 {
 		iface MIXER
 		name 'b HPCOM PGA Bypass Volume'
 		value.0 71
@@ -1194,7 +1162,7 @@ state.RX51 {
 			dbvalue.1 -2350
 		}
 	}
-	control.84 {
+	control.81 {
 		iface MIXER
 		name 'b HPCOM DAC Playback Volume'
 		value.0 71
@@ -1210,7 +1178,7 @@ state.RX51 {
 			dbvalue.1 -2350
 		}
 	}
-	control.85 {
+	control.82 {
 		iface MIXER
 		name 'b Line Playback Switch'
 		value.0 true
@@ -1221,7 +1189,7 @@ state.RX51 {
 			count 2
 		}
 	}
-	control.86 {
+	control.83 {
 		iface MIXER
 		name 'b HP Playback Switch'
 		value.0 true
@@ -1232,7 +1200,7 @@ state.RX51 {
 			count 2
 		}
 	}
-	control.87 {
+	control.84 {
 		iface MIXER
 		name 'b HPCOM Playback Switch'
 		value.0 true
@@ -1243,7 +1211,7 @@ state.RX51 {
 			count 2
 		}
 	}
-	control.88 {
+	control.85 {
 		iface MIXER
 		name 'b AGC Switch'
 		value.0 false
@@ -1254,7 +1222,7 @@ state.RX51 {
 			count 2
 		}
 	}
-	control.89 {
+	control.86 {
 		iface MIXER
 		name 'b Left AGC Target level'
 		value '-5.5dB'
@@ -1272,7 +1240,7 @@ state.RX51 {
 			item.7 '-24dB'
 		}
 	}
-	control.90 {
+	control.87 {
 		iface MIXER
 		name 'b Right AGC Target level'
 		value '-5.5dB'
@@ -1290,7 +1258,7 @@ state.RX51 {
 			item.7 '-24dB'
 		}
 	}
-	control.91 {
+	control.88 {
 		iface MIXER
 		name 'b Left AGC Attack time'
 		value '8ms'
@@ -1304,7 +1272,7 @@ state.RX51 {
 			item.3 '20ms'
 		}
 	}
-	control.92 {
+	control.89 {
 		iface MIXER
 		name 'b Right AGC Attack time'
 		value '8ms'
@@ -1318,7 +1286,7 @@ state.RX51 {
 			item.3 '20ms'
 		}
 	}
-	control.93 {
+	control.90 {
 		iface MIXER
 		name 'b Left AGC Decay time'
 		value '100ms'
@@ -1332,7 +1300,7 @@ state.RX51 {
 			item.3 '500ms'
 		}
 	}
-	control.94 {
+	control.91 {
 		iface MIXER
 		name 'b Right AGC Decay time'
 		value '100ms'
@@ -1346,7 +1314,7 @@ state.RX51 {
 			item.3 '500ms'
 		}
 	}
-	control.95 {
+	control.92 {
 		iface MIXER
 		name 'b De-emphasis Switch'
 		value.0 false
@@ -1357,7 +1325,7 @@ state.RX51 {
 			count 2
 		}
 	}
-	control.96 {
+	control.93 {
 		iface MIXER
 		name 'b PGA Capture Volume'
 		value.0 32
@@ -1373,7 +1341,7 @@ state.RX51 {
 			dbvalue.1 1600
 		}
 	}
-	control.97 {
+	control.94 {
 		iface MIXER
 		name 'b PGA Capture Switch'
 		value.0 true
@@ -1384,7 +1352,7 @@ state.RX51 {
 			count 2
 		}
 	}
-	control.98 {
+	control.95 {
 		iface MIXER
 		name 'b ADC HPF Cut-off'
 		value.0 Disabled
@@ -1399,7 +1367,7 @@ state.RX51 {
 			item.3 '0.025xFs'
 		}
 	}
-	control.99 {
+	control.96 {
 		iface MIXER
 		name 'b Output Driver Power-On time'
 		value '0us'
@@ -1421,7 +1389,7 @@ state.RX51 {
 			item.11 '4s'
 		}
 	}
-	control.100 {
+	control.97 {
 		iface MIXER
 		name 'b Output Driver Ramp-up step'
 		value '0ms'
@@ -1433,6 +1401,38 @@ state.RX51 {
 			item.1 '1ms'
 			item.2 '2ms'
 			item.3 '4ms'
+		}
+	}
+	control.98 {
+		iface MIXER
+		name 'McBSP2 Sidetone Switch'
+		value false
+		comment {
+			access 'read write'
+			type BOOLEAN
+			count 1
+		}
+	}
+	control.99 {
+		iface MIXER
+		name 'McBSP2 Sidetone Channel 0 Volume'
+		value 0
+		comment {
+			access 'read write'
+			type INTEGER
+			count 1
+			range '-32768 - 32767'
+		}
+	}
+	control.100 {
+		iface MIXER
+		name 'McBSP2 Sidetone Channel 1 Volume'
+		value 0
+		comment {
+			access 'read write'
+			type INTEGER
+			count 1
+			range '-32768 - 32767'
 		}
 	}
 	control.101 {

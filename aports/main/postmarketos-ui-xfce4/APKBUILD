@@ -10,7 +10,6 @@ makedepends=""
 install="$pkgname.post-install"
 subpackages=""
 source="start_xfce4.sh $install ${pkgname}-${pkgver}-${pkgrel}.tar.gz::https://github.com/postmarketOS/xfce4-phone/archive/${pkgver}.tar.gz"
-# g/tui/ofone/config.n900/xfce4/xfconf/xfce-perchannel-xml/
 options="!check"
 
 package() {

@@ -1,0 +1,29 @@
+From 655d4fb5cf2b6586f756ddedb842a621d0cf105b Mon Sep 17 00:00:00 2001
+From: Tero Kristo <t-kristo@ti.com>
+Date: Mon, 9 Oct 2017 11:56:02 +0300
+Subject: [PATCH 01/10] ARM: OMAP3: hwmod_data: add missing module_offs for
+ MMC3
+
+MMC3 hwmod data is missing the module_offs definition, so add CORE_MOD
+for it.
+
+Signed-off-by: Tero Kristo <t-kristo@ti.com>
+---
+ arch/arm/mach-omap2/omap_hwmod_3xxx_data.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c b/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c
+index c3276436b0ae..c12e7b572a41 100644
+--- a/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c
++++ b/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c
+@@ -1656,6 +1656,7 @@ static struct omap_hwmod omap3xxx_mmc3_hwmod = {
+ 	.main_clk	= "mmchs3_fck",
+ 	.prcm		= {
+ 		.omap2 = {
++			.module_offs = CORE_MOD,
+ 			.prcm_reg_id = 1,
+ 			.module_bit = OMAP3430_EN_MMC3_SHIFT,
+ 			.idlest_reg_id = 1,
+-- 
+2.14.1
+

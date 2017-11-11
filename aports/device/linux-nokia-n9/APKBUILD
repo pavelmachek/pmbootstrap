@@ -1,0 +1,128 @@
+# APKBUILD based on linux-vanilla aport. Changes:
+# - disabled module installation
+# - add !check !tracedeps
+# - package: just install zimage and kernel.release, because the kernel config
+#	does not generate modules or dtb files
+# - do not create -dev subpackage (makes no sense without module support)
+#
+# Kernel config based on: arch/arm/configs/lineageos_mako_defconfig
+# Changes:
+# - enable devtmpfs (needed for udev -> touch support in weston)
+
+_vendor=nokia
+_flavor=nokia-n9
+_config="config-${_flavor}.armhf"
+
+pkgname=linux-${_flavor}
+pkgver=4.14
+case $pkgver in
+	*.*.*)  _kernver=${pkgver%.*};;
+	*.*) _kernver=$pkgver;;
+esac
+pkgrel=0
+arch="armhf"
+pkgdesc="Nokia N9 kernel"
+url="https://github.com/torvalds/linux/"
+depends="postmarketos-mkinitfs"
+makedepends="perl sed installkernel bash gmp-dev bc linux-headers elfutils-dev"
+options="!strip !check !tracedeps"
+install=
+source="
+	$pkgname-$pkgver.tar.gz::https://github.com/torvalds/linux/archive/v$pkgver.tar.gz
+	0001-ARM-OMAP3-hwmod_data-add-missing-module_offs-for-MMC.patch
+	0002-ARM-OMAP2-3-CM-fix-cm_split_idlest-functionality.patch
+	0003-SEB.patch
+	0004-drm-add-rename-MIPI_DCS_SET_PARTIAL_XXX.patch
+	0005-drm-omap-panel-dsi-cm-use-defines-from-mipi_display..patch
+	0006-ARM-dts-n9-add-display-support.patch
+	0007-Revert-drm-omap-work-around-for-omap3-display-enable.patch
+	0008-HACK-drm-omap-panel-dsi-cm-force-0xff-for-brigthness.patch
+	0009-ARM-dts-N9-N950-Add-touchscreen-support.patch
+	0010-ARM-N9-N950-Add-PVR-drivers.patch
+	$_config
+	compiler-gcc6.h
+"
+subpackages=""
+license="GPL2"
+
+_abi_release=${pkgver}
+_carch="arm"
+HOSTCC="${CC:-gcc}"
+HOSTCC="${HOSTCC#${CROSS_COMPILE}}"
+
+ksrcdir="$srcdir/linux-$pkgver"
+
+prepare() {
+	local _patch_failed=
+	cd "$ksrcdir"
+
+	# first apply patches in specified order
+	for i in $source; do
+		case $i in
+		*.patch)
+			msg "Applying $i..."
+			if ! patch -s -p1 -N -i "$srcdir"/$i; then
+				echo $i >>failed
+				_patch_failed=1
+			fi
+			;;
+		esac
+	done
+
+	if ! [ -z "$_patch_failed" ]; then
+		error "The following patches failed:"
+		cat failed
+		return 1
+	fi
+
+	# gcc6 support
+	cp -v "$srcdir/compiler-gcc6.h" "$ksrcdir/include/linux/"
+
+	mkdir -p "$srcdir"/build
+	cp "$srcdir"/$_config "$srcdir"/build/.config || return 1
+	make -C "$ksrcdir" O="$srcdir"/build ARCH="$_carch" HOSTCC="$HOSTCC" \
+		olddefconfig
+}
+
+
+
+# this is so we can do: 'abuild menuconfig' to reconfigure kernel
+menuconfig() {
+	cd "$srcdir"/build || return 1
+	make ARCH="$_carch" menuconfig
+	cp .config "$startdir"/$_config
+}
+
+build() {
+	cd "$srcdir"/build
+	unset LDFLAGS
+	make ARCH="$_carch" CC="${CC:-gcc}" \
+		KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Alpine" \
+		|| return 1
+}
+
+package() {
+	cd "$srcdir/build/arch/arm/boot"
+
+	cat zImage dts/omap3-n9.dtb > zImage-dtb
+
+	install -Dm644 "$srcdir/build/arch/arm/boot/zImage-dtb" \
+		"$pkgdir/boot/vmlinuz-$_flavor"
+
+	install -D "$srcdir/build/include/config/kernel.release" \
+		"$pkgdir/usr/share/kernel/$_flavor/kernel.release"
+}
+
+sha512sums="756c34ea1cd862b2689b08113df01af71218475507baad101ec74adbbd4c6af3e91b8482ae4c461f8c0ff53d4b9c149a8067a202b4f20690ce349c0b7d0ca6db  linux-nokia-n9-4.14.tar.gz
+ca4325299b8072c33074e476b95c074792794699e3cc5ee178c0945691a47d900b151929ce256b543677945fdb426cc20d9a06042effe90d9e8f33d0c91c2340  0001-ARM-OMAP3-hwmod_data-add-missing-module_offs-for-MMC.patch
+17792603c2369c07da248bb2487e9b9adb93846ed4340dfe61885aa4e50ba89bedc9f2bb92f716bb231bf96a4bd0b27c93f11a876c75d11af59af2477c020b07  0002-ARM-OMAP2-3-CM-fix-cm_split_idlest-functionality.patch
+11a6bc4820b52a78b7a695350ddcaabd7893917346cfe19feef5bfc87142ab69b0c875da3c32cb684dcc105a7c79413513ac6c9ad0e3119b772d7e53ed259e77  0003-SEB.patch
+45dc4e4cb5469958ad5c64baac5c3d246f13d235827e64efc60d19bfcd75a24298fe0113e31a11c94295fd30d985bb6af1d0ed9a5348ddb53dacb0e30671c488  0004-drm-add-rename-MIPI_DCS_SET_PARTIAL_XXX.patch
+68b7c0f15b47bf6d054258ae795159e24cdc35c5747fdedd516612322d5ff5bd9f955e4e7ff87a284e167e4bf21802034e8c5d0409c809918c46c9325b6735fc  0005-drm-omap-panel-dsi-cm-use-defines-from-mipi_display..patch
+a3eebd7caff1e450a38fa6f2e1cb516cc6b27da0be888e8a4a30dd9a3a878cac869e266a5c1a5774bafcda6ef7e66305bff884347157753692c74e0cf8f1cb7e  0006-ARM-dts-n9-add-display-support.patch
+5d3e86deb83d13dd289f373ca0975c356b3bf5108c472c0fddcbffe312f3af40434cec556cb3698667193da790aefe2e577caab97998eac7b22759d78484f915  0007-Revert-drm-omap-work-around-for-omap3-display-enable.patch
+3144c0f3735c666cc894ef7ecb064a52d42d7e0cfa319ead9a2e743fd3ee8cbb06b33daadde9661aff9465be1b1d229c3fad84dffe43d8142fc4e67d4692180c  0008-HACK-drm-omap-panel-dsi-cm-force-0xff-for-brigthness.patch
+1304b4f49e2be7fdc9d02003e755f850ccc2cb268ceebf9e71c454d4b74cc21eb4c3c4f736c5eaa56dc526604477c51de7b6442540664be9c4797b5fee11eaef  0009-ARM-dts-N9-N950-Add-touchscreen-support.patch
+6a85cce32a94fe09230c3582dfc8de77195df1b2b5f764f9cee5859479ea22da1b596a70d5661edfe7180b28e66d22b99b9113103181139a0e2329ff6452e373  0010-ARM-N9-N950-Add-PVR-drivers.patch
+dd2a353a74513ace46b0db4f352aa01a7e86af0caa2f099dd2f03c1dd6c80c7592ad8a81317e21a96675b8a31711ad546e45667e54f2ae2a6b703ec7adf66c16  config-nokia-n9.armhf
+09a8aec324200d939aae87c0ab93064c80e4529435c582c8951ef8c63d7d6e148d722846b5a2f0bc96a43d04d4f5703d0f56f6675431b7fb7937049d694beb18  compiler-gcc6.h"

@@ -1,0 +1,45 @@
+pkgname=device-nokia-n9
+pkgver=1
+pkgrel=14
+pkgdesc="Nokia N9"
+url="https://github.com/postmarketOS"
+arch="noarch"
+license="MIT"
+depends="linux-nokia-n9 linux-firmware ofono watchdog-kick evtest"
+makedepends=""
+install=""
+subpackages="$pkgname-weston:weston"
+source="
+	deviceinfo
+	initfs-hook.sh
+	RM-696_Pyrenees_SMD_V1_6.raw
+	weston.ini
+	$install
+"
+options="!check"
+
+build() {
+	return 0
+}
+
+package() {
+	install -D -m644 "$srcdir"/deviceinfo \
+		"$pkgdir"/etc/deviceinfo
+	install -D -m644 "$srcdir"/initfs-hook.sh \
+		"$pkgdir"/etc/postmarketos-mkinitfs/hooks/00-${pkgname}.sh
+
+	#Atmel TS
+	install -D -m644 "$srcdir"/RM-696_Pyrenees_SMD_V1_6.raw \
+		"$pkgdir"/lib/firmware/maxtouch.cfg
+}
+
+weston() {
+	install_if="$pkgname weston"
+	install -Dm644 "$srcdir"/weston.ini \
+		"$subpkgdir"/etc/xdg/weston/weston.ini
+}
+
+sha512sums="3e86685058e994e845caba44f3d35240fa7f1add29543e51413aeeac88bcdacdfca836ac0c691f50febdaa0c9539dc38d8f45316f2c8b1378f2bc8f9d1600653  deviceinfo
+16a5191237335c619ac4864e080089e8a5924a319dcac5c283fc6b8ae924e474149096c169f90986bead5be6c7b536a2c2542a3dec89eae55fad06bbce4ae6d1  initfs-hook.sh
+70f911147017f4dec3521816a3ce719d65a1b119ac1773d6c7edc7116925eafc3731bd2a198f790351f798726a7ba6476dff447d498c51d22e9366e2b591f9c6  RM-696_Pyrenees_SMD_V1_6.raw
+df0fe900693e5f176076c59f5379e56aaa96c3df16a4120448f15b71f530170730b43e5fe32733c40c118a00ca3581043231a062a8a1eb0a930bfbfbb6c52a47  weston.ini"

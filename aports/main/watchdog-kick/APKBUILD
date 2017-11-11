@@ -1,0 +1,25 @@
+pkgname=watchdog-kick
+pkgver=0.1
+pkgrel=0
+pkgdesc="Periodically kich watchdogs"
+url="https://github.com/postmarketOS"
+arch="all"
+license="GPL2"
+install="$pkgname.post-install"
+source="
+	watchdog-kick.init
+	watchdog-kick
+"
+
+build() {
+	return 0
+}
+
+package() {
+	install -Dm755 "${srcdir}/watchdog-kick" \
+		"${pkgdir}/usr/sbin/watchdog-kick"
+	install -Dm755 "${srcdir}/watchdog-kick.init" \
+		"${pkgdir}/etc/init.d/watchdog-kick"
+}
+sha512sums="2b24919ea8206e698bd0ba6301f2dccb235612fff6438e56c8ea8971fe7da4de052ba49ddada307fa4f0f98882725a6d99fb07804e95a0356e350143fb5c7724  watchdog-kick.init
+079ccd14cd9256280200ab395f3761ef79513ba7d068cb23aeafde29e75e27d9ca9a18dbe44efd26cff9a939751f70a462f709c9eee6004df48316b1c08e9467  watchdog-kick"

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+while :
+do
+	for wd in /dev/watchdog?; do
+		if [ -c $wd ]; then
+			echo X > $wd
+		fi
+	done
+	sleep 10s
+done

@@ -82,7 +82,7 @@ def arguments_initfs(subparser):
     hook_del = sub.add_parser("hook_del", help="uninstall a hook package")
     for action in [hook_add, hook_del]:
         action.add_argument("hook", help="name of the hook aport, without the"
-                            " '" + pmb.config.initfs_hook_prefix + "' prefix, for example: 'usb-shell'")
+                            " '" + pmb.config.initfs_hook_prefix + "' prefix, for example: 'debug-shell'")
 
     # ls, build, extract
     ls = sub.add_parser("ls", help="list initramfs contents")
@@ -174,6 +174,7 @@ def arguments():
     sub.add_parser("shutdown", help="umount, unregister binfmt")
     sub.add_parser("index", help="re-index all repositories with custom built"
                    " packages (do this after manually removing package files)")
+    sub.add_parser("update", help="update all APKINDEX files")
     arguments_export(sub)
     arguments_flasher(sub)
     arguments_initfs(sub)
@@ -206,7 +207,7 @@ def arguments():
 
     # Action: stats
     stats = sub.add_parser("stats", help="show ccache stats")
-    stats.add_argument("--arch")
+    stats.add_argument("--arch", default=arch_native, choices=arch_choices)
 
     # Action: build_init / chroot
     build_init = sub.add_parser("build_init", help="initialize build"
@@ -269,18 +270,22 @@ def arguments():
                               " (aport/APKBUILD) based on an upstream aport from Alpine")
     build = sub.add_parser("build", help="create a package for a"
                            " specific architecture")
-    build.add_argument("--arch", choices=arch_choices)
-    build.add_argument("--force", action="store_true")
+    build.add_argument("--arch", choices=arch_choices, default=None,
+                       help="CPU architecture to build for (default: " +
+                       arch_native + " or first available architecture in"
+                       " APKBUILD)")
+    build.add_argument("--force", action="store_true", help="even build if not"
+                       " necessary")
     build.add_argument("--buildinfo", action="store_true")
     build.add_argument("--strict", action="store_true", help="(slower) zap and install only"
                        " required depends when building, to detect dependency errors")
-    build.add_argument("--noarch-arch", dest="noarch_arch", default=None,
-                       help="which architecture to use to build 'noarch'"
-                            " packages. Defaults to the native arch normally,"
-                            " and to the device arch when --strict is set."
-                            " Override in case of strict mode failing on"
-                            " dependencies, which only exist for a certain"
-                            " arch.")
+    build.add_argument("-i", "--ignore-depends", action="store_true",
+                       help="only build and install makedepends from an"
+                       " APKBUILD, ignore the depends (old behavior). This is"
+                       " faster for device packages for example, because then"
+                       " you don't need to build and install the kernel. But it"
+                       " is incompatible with how Alpine's abuild handles it.",
+                       dest="ignore_depends")
     for action in [checksum, build, aportgen]:
         action.add_argument("packages", nargs="+")
 
@@ -316,23 +321,22 @@ def arguments():
     config.add_argument("name", nargs="?", help="variable name")
     config.add_argument("value", nargs="?", help="set variable to value")
 
+    # Action: bootimg_analyze
+    bootimg_analyze = sub.add_parser("bootimg_analyze", help="Extract all the"
+                                     " information from an existing boot.img")
+    bootimg_analyze.add_argument("path", help="path to the boot.img")
+
     # Use defaults from the user's config file
     args = parser.parse_args()
-    cfg = pmb.config.load(args)
-    for varname in cfg["pmbootstrap"]:
-        if varname not in args or not getattr(args, varname):
-            value = cfg["pmbootstrap"][varname]
-            if varname in pmb.config.defaults:
-                default = pmb.config.defaults[varname]
-                if isinstance(default, bool):
-                    value = (value.lower() == "true")
-            setattr(args, varname, value)
+    pmb.config.merge_with_args(args)
 
-    # Replace $WORK in variables from user's config
-    for varname in cfg["pmbootstrap"]:
-        old = getattr(args, varname)
+    # Replace $WORK in variables from any config
+    for key, value in pmb.config.defaults.items():
+        if key not in args:
+            continue
+        old = getattr(args, key)
         if isinstance(old, str):
-            setattr(args, varname, old.replace("$WORK", args.work))
+            setattr(args, key, old.replace("$WORK", args.work))
 
     # Add convenience shortcuts
     setattr(args, "arch_native", arch_native)
@@ -343,10 +347,11 @@ def arguments():
                             "apk_min_version_checked": [],
                             "apk_repository_list_updated": [],
                             "aports_files_out_of_sync_with_git": None,
+                            "built": {},
                             "find_aport": {}})
 
     # Add and verify the deviceinfo (only after initialization)
-    if args.action not in ("init", "config"):
+    if args.action not in ("init", "config", "bootimg_analyze"):
         setattr(args, "deviceinfo", pmb.parse.deviceinfo(args))
         arch = args.deviceinfo["arch"]
         if (arch != args.arch_native and

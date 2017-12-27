@@ -3,7 +3,7 @@
 
 pkgname=musl-aarch64
 pkgver=1.1.18
-pkgrel=0
+pkgrel=3
 subpackages="musl-dev-aarch64:package_dev"
 
 _arch="aarch64"
@@ -46,5 +46,5 @@ package_dev() {
     done
 }
 
-sha512sums="0b67120490d0129f259689327ec0d7df2b2b77e50962918b1c76176a9f242f93a493c5ee65bfff3650342b795a2fcffc7656e5a37084a26e99680bd543711a19  musl-1.1.18-r0-aarch64.apk
-fec146c1dc5a83d990146cb53b996a6ddf2745e85adf7782d533b7760a7f7ab2a12ae26468b5e893db5b3e0108d993e64b04c639fb544a8ef48a89632eeae4da  musl-dev-1.1.18-r0-aarch64.apk"
+sha512sums="b20c104c0126e6eb1e9c735c6312546e4c994326d1699d48bc0648023053a63e0f454add0d8742fdfab9f7f0b60ffa127574aa920a0233127ee9e7148a9db972  musl-1.1.18-r3-aarch64.apk
+2db0564dddf96782bf1baafd8206d28e1a4396dce738f3a8c084d34cff81b2477e6255adcee856d0b70dfb5d581ea5314c5359e67fd19c4076ac3e62afea88b8  musl-dev-1.1.18-r3-aarch64.apk"

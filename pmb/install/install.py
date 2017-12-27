@@ -62,6 +62,7 @@ def get_subpartitions_size(args):
     # Add some free space, see also:
     # https://github.com/postmarketOS/pmbootstrap/pull/336
     full *= 1.20
+    full += 50 * 1024 * 1024
     boot += 15 * 1024 * 1024
     return (full, boot)
 
@@ -117,10 +118,12 @@ def set_user(args):
         pmb.chroot.root(args, ["addgroup", args.user, "wheel"], suffix)
 
 
-def set_user_password(args):
+def setup_login(args):
     """
-    Loop until the passwords for user and root have been changed successfully.
+    Loop until the password for user has been set successfully, and disable root
+    login.
     """
+    # User password
     logging.info(" *** SET LOGIN PASSWORD FOR: '" + args.user + "' ***")
     suffix = "rootfs_" + args.device
     while True:
@@ -131,6 +134,9 @@ def set_user_password(args):
             logging.info("WARNING: Failed to set the password. Try it"
                          " one more time.")
             pass
+
+    # Disable root login
+    pmb.chroot.root(args, ["passwd", "-l", "root"], suffix)
 
 
 def copy_ssh_key(args):
@@ -230,7 +236,7 @@ def install_system_image(args):
     logging.info("  Flashes the kernel + initramfs to your device:")
     logging.info("  " + args.work + "/chroot_rootfs_" + args.device +
                  "/boot")
-    method = args.deviceinfo["flash_methods"]
+    method = args.deviceinfo["flash_method"]
     if (method in pmb.config.flashers and "boot" in
             pmb.config.flashers[method]["actions"]):
         logging.info("  (NOTE: " + method + " also supports booting"
@@ -315,7 +321,7 @@ def install(args):
         pmb.chroot.initfs.build(args, flavor, suffix)
 
     # Set the user password
-    set_user_password(args)
+    setup_login(args)
 
     # Set the keymap if the device requires it
     setup_keymap(args)

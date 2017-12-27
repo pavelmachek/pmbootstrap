@@ -24,12 +24,13 @@ import os
 #
 from pmb.config.load import load
 from pmb.config.save import save
+from pmb.config.merge_with_args import merge_with_args
 
 
 #
 # Exported variables (internal configuration)
 #
-version = "0.3.0"
+version = "0.4.0"
 pmb_src = os.path.normpath(os.path.realpath(__file__) + "/../../..")
 apk_keys_path = pmb_src + "/keys"
 
@@ -43,35 +44,40 @@ apk_tools_static_min_version = "2.7.2-r0"
 # see migrate_work_folder()).
 work_version = "1"
 
+# Only save keys to the config file, which we ask for in 'pmbootstrap init'.
+config_keys = ["ccache_size", "device", "extra_packages", "jobs", "keymap",
+               "qemu_mesa_driver", "timestamp_based_rebuild", "timezone",
+               "ui", "user", "work"]
+
 # Config file/commandline default values
 # $WORK gets replaced with the actual value for args.work (which may be
 # overriden on the commandline)
 defaults = {
     "alpine_version": "edge",  # alternatively: latest-stable
     "aports": os.path.normpath(pmb_src + "/aports"),
-    "config": os.path.expanduser("~") + "/.config/pmbootstrap.cfg",
-    "device": "samsung-i9100",
-    "extra_packages": "none",
-    "jobs": str(multiprocessing.cpu_count() + 1),
-    "timestamp_based_rebuild": True,
-    "log": "$WORK/log.txt",
-    "mirror_alpine": "https://nl.alpinelinux.org/alpine/",
-    "mirror_postmarketos": "",
-    "work": os.path.expanduser("~") + "/.local/var/pmbootstrap",
-    "port_distccd": "33632",
-    "qemu_mesa_driver": "dri-virtio",
-    "ui": "weston",
-    "user": "user",
-    "keymap": "",
-    "timezone": "GMT",
-
+    "ccache_size": "5G",
     # aes-xts-plain64 would be better, but this is not supported on LineageOS
     # kernel configs
     "cipher": "aes-cbc-plain64",
+    "config": os.path.expanduser("~") + "/.config/pmbootstrap.cfg",
+    "device": "samsung-i9100",
+    "extra_packages": "none",
     # A higher value is typically desired, but this can lead to VERY long open
     # times on slower devices due to host systems being MUCH faster than the
     # target device: <https://github.com/postmarketOS/pmbootstrap/issues/429>
-    "iter_time": "200"
+    "iter_time": "200",
+    "jobs": str(multiprocessing.cpu_count() + 1),
+    "keymap": "",
+    "log": "$WORK/log.txt",
+    "mirror_alpine": "http://dl-cdn.alpinelinux.org/alpine/",
+    "mirror_postmarketos": "http://postmarketos.brixit.nl",
+    "port_distccd": "33632",
+    "qemu_mesa_driver": "dri-virtio",
+    "timestamp_based_rebuild": True,
+    "timezone": "GMT",
+    "ui": "weston",
+    "user": "user",
+    "work": os.path.expanduser("~") + "/.local/var/pmbootstrap",
 }
 
 #
@@ -131,6 +137,9 @@ chroot_device_nodes = [
     [644, "c", 1, 9, "urandom"],
 ]
 
+# Age in hours that we keep the APKINDEXes before downloading them again.
+# You can force-update them with 'pmbootstrap update'.
+apkindex_retention_time = 4
 
 #
 # BUILD
@@ -148,7 +157,7 @@ build_packages = ["abuild", "build-base", "ccache"]
 
 # fnmatch for supported pkgnames, that can be directly compiled inside
 # the native chroot and a cross-compiler, without using distcc
-build_cross_native = ["linux-*"]
+build_cross_native = ["linux-*", "arch-bin-masquerade"]
 
 # Necessary kernel config options
 necessary_kconfig_options = {
@@ -190,6 +199,9 @@ apkbuild_attributes = {
 
     # mesa
     "_llvmver": {"array": False},
+
+    # Overridden packages
+    "_pkgver": {"array": False},
 }
 
 # Variables from deviceinfo. Reference: <https://postmarketos.org/deviceinfo>
@@ -205,7 +217,7 @@ deviceinfo_attributes = [
     "modules_initfs",
     "external_disk",
     "external_disk_install",
-    "flash_methods",
+    "flash_method",
     "arch",
 
     # flash
@@ -260,6 +272,8 @@ install_device_packages = [
 #
 # FLASH
 #
+
+flash_methods = ["fastboot", "heimdall", "0xffff", "none"]
 
 # These folders will be mounted at the same location into the native
 # chroot, before the flash programs get started.

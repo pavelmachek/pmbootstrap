@@ -246,71 +246,30 @@ def index_repo(args, arch=None):
         paths = glob.glob(args.work + "/packages/*")
 
     for path in paths:
-        path_arch = os.path.basename(path)
-        path_repo_chroot = "/home/pmos/packages/pmos/" + path_arch
-        logging.debug("(native) index " + path_arch + " repository")
-        commands = [
-            ["apk", "-q", "index", "--output", "APKINDEX.tar.gz_",
-             "--rewrite-arch", path_arch, "*.apk"],
-            ["abuild-sign", "APKINDEX.tar.gz_"],
-            ["mv", "APKINDEX.tar.gz_", "APKINDEX.tar.gz"]
-        ]
-        for command in commands:
-            pmb.chroot.user(args, command, working_dir=path_repo_chroot)
-        pmb.parse.apkindex.clear_cache(args, args.work + path +
-                                       "/APKINDEX.tar.gz")
+        if os.path.exists(path):
+            path_arch = os.path.basename(path)
+            path_repo_chroot = "/home/pmos/packages/pmos/" + path_arch
+            logging.debug("(native) index " + path_arch + " repository")
+            commands = [
+                ["apk", "-q", "index", "--output", "APKINDEX.tar.gz_",
+                 "--rewrite-arch", path_arch, "*.apk"],
+                ["abuild-sign", "APKINDEX.tar.gz_"],
+                ["mv", "APKINDEX.tar.gz_", "APKINDEX.tar.gz"]
+            ]
+            for command in commands:
+                pmb.chroot.user(args, command, working_dir=path_repo_chroot)
+        else:
+            logging.debug("NOTE: Can't build index for non-existing path: " +
+                          path)
+        pmb.parse.apkindex.clear_cache(args, path + "/APKINDEX.tar.gz")
 
 
-def symlink_noarch_packages(args):
-    """
-    All noarch packages from the native architecture folder (x86_64 usually)
-    get symlinked to all other architectures.
-    """
-    # Create the arch folders
-    architectures = pmb.config.build_device_architectures
-    logging.debug("Symlink noarch-packages to " + ", ".join(architectures))
-    for arch in architectures:
-        arch_folder = "/mnt/pmbootstrap-packages/" + arch
-        arch_folder_outside = args.work + "/packages/" + arch
-        if not os.path.exists(arch_folder_outside):
-            pmb.chroot.user(args, ["mkdir", "-p", arch_folder])
-
-    # Create an APKINDEX *without* replaced architectures (that is much
-    # faster than reading each apk file with Python!)
-    index = "/tmp/APKINDEX_without_replaced_archs"
-    index_outside = args.work + "/chroot_native" + index
-    pmb.chroot.user(args, ["apk", "-q", "index", "--output", index, "*.apk"],
-                    working_dir="/mnt/pmbootstrap-packages/" + args.arch_native)
-
-    # Iterate over noarch packages
-    for package, data in pmb.parse.apkindex.parse(args, index_outside).items():
-        if data["arch"] != "noarch":
-            continue
-
-        # Create missing symlinks
-        apk_file = data["pkgname"] + "-" + data["version"] + ".apk"
-        for arch in architectures:
-            if os.path.exists(args.work + "/packages/" + arch + "/" + apk_file):
-                continue
-            arch_folder = "/mnt/pmbootstrap-packages/" + arch
-            source = "../" + args.arch_native + "/" + apk_file
-            pmb.chroot.user(args, ["ln", "-sf", source, "."],
-                            working_dir=arch_folder)
-
-    # Rewrite indexes
-    for arch in architectures:
-        index_repo(args, arch)
-
-
-def ccache_stats(args, arch):
-    suffix = "native"
-    if args.arch:
-        suffix = "buildroot_" + arch
-    pmb.chroot.user(args, ["ccache", "-s"], suffix, log=False)
-
-
-# set the correct JOBS count in abuild.conf
 def configure_abuild(args, suffix, verify=False):
+    """
+    Set the correct JOBS count in abuild.conf
+
+    :param verify: internally used to test if changing the config has worked.
+    """
     path = args.work + "/chroot_" + suffix + "/etc/abuild.conf"
     prefix = "export JOBS="
     with open(path, encoding="utf-8") as handle:
@@ -327,3 +286,27 @@ def configure_abuild(args, suffix, verify=False):
                 configure_abuild(args, suffix, True)
             return
     raise RuntimeError("Could not find " + prefix + " line in " + path)
+
+
+def configure_ccache(args, suffix="native", verify=False):
+    """
+    Set the maximum ccache size
+
+    :param verify: internally used to test if changing the config has worked.
+    """
+    # Check if the settings have been set already
+    arch = pmb.parse.arch.from_chroot_suffix(args, suffix)
+    path = args.work + "/cache_ccache_" + arch + "/ccache.conf"
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as handle:
+            for line in handle:
+                if line == ("max_size = " + args.ccache_size + "\n"):
+                    return
+    if verify:
+        raise RuntimeError("Failed to configure ccache: " + path + "\nTry to"
+                           " delete the file (or zap the chroot).")
+
+    # Set the size and verify
+    pmb.chroot.user(args, ["ccache", "--max-size", args.ccache_size],
+                    suffix)
+    configure_ccache(args, suffix, True)

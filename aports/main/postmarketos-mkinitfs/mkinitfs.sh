@@ -197,6 +197,10 @@ create_bootimg()
 	if [ -n "${deviceinfo_dtb}" ]; then
 		kernelfile="${kernelfile}-dtb"
 	fi
+	_dt=""
+	if [ "${deviceinfo_bootimg_qcdt}" == "true" ]; then
+		_dt="--dt /boot/dt.img"
+	fi
 	mkbootimg \
 		--kernel "${kernelfile}" \
 		--ramdisk "$outfile" \
@@ -207,7 +211,7 @@ create_bootimg()
 		--ramdisk_offset "${deviceinfo_flash_offset_ramdisk}" \
 		--tags_offset "${deviceinfo_flash_offset_tags}" \
 		--pagesize "${deviceinfo_flash_pagesize}" \
-		${deviceinfo_bootimg_qcdt:+ --dt /boot/dt.img} \
+		${_dt} \
 		-o "${outfile/initramfs-/boot.img-}"
 }
 
@@ -236,7 +240,8 @@ generate_splash_screens()
 	       "splash-noboot"           "boot partition not found\\nhttps://postmarketos.org/troubleshooting" "--center" \
 	       "splash-noinitramfsextra" "initramfs-extra not found\\nhttps://postmarketos.org/troubleshooting" "--center" \
 	       "splash-nosystem"         "system partition not found\\nhttps://postmarketos.org/troubleshooting" "--center" \
-	       "splash-mounterror"       "unable to mount root partition\\nhttps://postmarketos.org/troubleshooting" "--center"
+	       "splash-mounterror"       "unable to mount root partition\\nhttps://postmarketos.org/troubleshooting" "--center" \
+	       "splash-debug-shell"      "WARNING\\ndebug-shell is active\\nhttps://postmarketos.org/debug-shell" "--center"
 
 	# Ensure cache folder exists
 	mkdir -p "${splash_cache_dir}"

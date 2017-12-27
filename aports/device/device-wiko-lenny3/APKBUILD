@@ -1,0 +1,17 @@
+pkgname="device-wiko-lenny3"
+pkgdesc="Lenny 3"
+pkgver=0.1
+pkgrel=1
+url="https://postmarketos.org"
+license="MIT"
+arch="noarch"
+options="!check"
+depends="linux-wiko-lenny3 mkbootimg"
+source="deviceinfo"
+
+package() {
+	install -Dm644 "$srcdir"/deviceinfo \
+		"$pkgdir"/etc/deviceinfo
+}
+
+sha512sums="fd4abeb2308210f498be77adec0a5eef39edeb38996199944ce45fd877b81f478fa5ffb9ac4994797e239571efa399902a4587255768e0910faf55b2dace4ddc  deviceinfo"

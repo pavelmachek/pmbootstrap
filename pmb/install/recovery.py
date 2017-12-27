@@ -30,7 +30,7 @@ def create_zip(args, suffix):
     zip_root = "/var/lib/postmarketos-android-recovery-installer/"
     rootfs = "/mnt/rootfs_" + args.device
     flavor = pmb.helpers.frontend._parse_flavor(args)
-    method = args.deviceinfo["flash_methods"]
+    method = args.deviceinfo["flash_method"]
     vars = pmb.flasher.variables(args, flavor, method)
 
     # Install recovery installer package in buildroot
@@ -64,7 +64,7 @@ def create_zip(args, suffix):
 
     commands = [
         # Move config file from /tmp/ to zip root
-        ["mv", "/tmp/install_options", "install_options"],
+        ["mv", "/tmp/install_options", "chroot/install_options"],
         # Create tar archive of the rootfs
         ["tar", "-pcf", "rootfs.tar", "--exclude",
          "./home/" + args.user + "/*", "-C", rootfs, "."],
@@ -72,6 +72,6 @@ def create_zip(args, suffix):
         ["tar", "-prf", "rootfs.tar", "-C", "/", "./etc/apk/keys"],
         # Compress with -1 for speed improvement
         ["gzip", "-f1", "rootfs.tar"],
-        ["build-recovery-zip"]]
+        ["build-recovery-zip", args.device]]
     for command in commands:
         pmb.chroot.root(args, command, suffix, working_dir=zip_root)

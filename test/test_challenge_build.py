@@ -23,7 +23,7 @@ import pytest
 # Import from parent directory
 sys.path.append(os.path.realpath(
     os.path.join(os.path.dirname(__file__) + "/..")))
-import pmb.build.package
+import pmb.build
 import pmb.challenge.build
 import pmb.config
 import pmb.helpers.logging
@@ -65,6 +65,7 @@ def test_challenge_build(args):
                            apk_path + ".buildinfo.json"])
 
     # Challenge, output changes into a file
+    args.cache["built"] = {}
     setattr(args, "output_repo_changes", args.work + "/chroot_native/tmp/"
                   "test_challenge_build_output.txt")
     pmb.challenge.build(args, args.work + "/chroot_native/" + temp_path + "/" +

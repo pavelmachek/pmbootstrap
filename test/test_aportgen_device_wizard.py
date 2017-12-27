@@ -32,19 +32,24 @@ import pmb.parse
 
 @pytest.fixture
 def args(tmpdir, request):
-    sys.argv = ["pmbootstrap.py", "chroot"]
+    sys.argv = ["pmbootstrap.py", "build", "-i", "device-testsuite-testdevice"]
     args = pmb.parse.arguments()
     args.log = args.work + "/log_testsuite.txt"
     pmb.helpers.logging.init(args)
     request.addfinalizer(args.logfd.close)
 
-    # Fake aports folder):
+    # Fake aports folder:
     tmpdir = str(tmpdir)
     setattr(args, "_aports_real", args.aports)
     args.aports = tmpdir
-    pmb.helpers.run.user(args, ["mkdir", "-p", tmpdir + "/device"])
+
+    # Copy the devicepkg-dev package (shared device-* APKBUILD code)
+    pmb.helpers.run.user(args, ["mkdir", "-p", tmpdir + "/main"])
+    path_dev = args._aports_real + "/main/devicepkg-dev"
+    pmb.helpers.run.user(args, ["cp", "-r", path_dev, tmpdir + "/main"])
 
     # Copy the linux-lg-mako aport (we currently copy patches from there)
+    pmb.helpers.run.user(args, ["mkdir", "-p", tmpdir + "/device"])
     path_mako = args._aports_real + "/device/linux-lg-mako"
     pmb.helpers.run.user(args, ["cp", "-r", path_mako, tmpdir + "/device"])
     return args
@@ -107,20 +112,20 @@ def test_aportgen_device_wizard(args, monkeypatch):
     # First run
     deviceinfo, apkbuild, apkbuild_linux = generate(args, monkeypatch, answers)
     assert apkbuild["pkgname"] == "device-testsuite-testdevice"
-    assert apkbuild["pkgdesc"] == "Testsuite Testdevice"
+    assert apkbuild["pkgdesc"] == "Testsuite Testsuite Testdevice"
     assert apkbuild["depends"] == ["linux-testsuite-testdevice"]
 
     assert apkbuild_linux["pkgname"] == "linux-testsuite-testdevice"
-    assert apkbuild_linux["pkgdesc"] == "Testsuite Testdevice kernel fork"
+    assert apkbuild_linux["pkgdesc"] == "Testsuite Testsuite Testdevice kernel fork"
     assert apkbuild_linux["arch"] == ["armhf"]
     assert apkbuild_linux["_flavor"] == "testsuite-testdevice"
 
     assert deviceinfo["name"] == "Testsuite Testdevice"
-    assert deviceinfo["manufacturer"] == answers["Manufacturer"]
+    assert deviceinfo["manufacturer"] == "Testsuite"
     assert deviceinfo["arch"] == "armhf"
     assert deviceinfo["keyboard"] == "false"
     assert deviceinfo["external_disk"] == "true"
-    assert deviceinfo["flash_methods"] == "heimdall-isorec"
+    assert deviceinfo["flash_method"] == "heimdall-isorec"
     assert deviceinfo["generate_bootimg"] == ""
     assert deviceinfo["generate_legacy_uboot_initfs"] == ""
 
@@ -139,9 +144,10 @@ def test_aportgen_device_wizard(args, monkeypatch):
     # fastboot (mkbootimg)
     answers["overwrite"] = "y"
     answers["Flash method"] = "fastboot"
+    answers["Path"] = ""
     deviceinfo, apkbuild, apkbuild_linux = generate(args, monkeypatch, answers)
     assert apkbuild["depends"] == ["linux-testsuite-testdevice", "mkbootimg"]
-    assert deviceinfo["flash_methods"] == answers["Flash method"]
+    assert deviceinfo["flash_method"] == answers["Flash method"]
     assert deviceinfo["generate_bootimg"] == "true"
 
     # 0xffff (legacy uboot initfs)

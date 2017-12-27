@@ -16,8 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with pmbootstrap.  If not, see <http://www.gnu.org/licenses/>.
 """
-
-
 import sys
 import logging
 import os
@@ -35,6 +33,7 @@ def main():
     # Parse arguments, set up logging
     args = parse.arguments()
     pmb_logging.init(args)
+    os.umask(0o22)
 
     # Wrap everything to display nice error messages
     try:
@@ -45,9 +44,11 @@ def main():
         if args.action == "init":
             return config_init.frontend(args)
         elif not os.path.exists(args.config):
-            logging.critical("Please specify a config file, or run"
-                             " 'pmbootstrap init' to generate one.")
-            return 1
+            raise RuntimeError("Please specify a config file, or run"
+                               " 'pmbootstrap init' to generate one.")
+        elif not os.path.exists(args.work):
+            raise RuntimeError("Work path not found, please run 'pmbootstrap"
+                               " init' to create it.")
 
         # Migrate work folder if necessary
         if args.action not in ["shutdown", "zap", "log"]:

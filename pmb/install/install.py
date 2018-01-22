@@ -86,9 +86,14 @@ def copy_files_from_chroot(args):
             continue
         folders += [os.path.basename(path)]
 
+    if False:
     # Run the copy command
-    pmb.chroot.root(args, ["cp", "-a"] + folders + ["/mnt/install/"],
-                    working_dir=mountpoint)
+        pmb.chroot.root(args, ["cp", "-a"] + folders + ["/mnt/install/"],
+                        working_dir=mountpoint)
+    else:
+        pmb.chroot.root(args, ["rsync", "-avP", "--delete"] + folders + ["/mnt/install/"],
+                        working_dir=mountpoint)
+        
 
 
 def copy_files_other(args):
@@ -102,8 +107,9 @@ def copy_files_other(args):
 
     # Create /home/{user}
     homedir = rootfs + "/home/" + args.user
-    pmb.helpers.run.root(args, ["mkdir", rootfs + "/home"])
-    pmb.helpers.run.root(args, ["cp", "-a", rootfs + "/etc/skel", homedir])
+    if False:
+        pmb.helpers.run.root(args, ["mkdir", rootfs + "/home"])
+    pmb.helpers.run.root(args, ["rsync", "-zavP", "--delete", rootfs + "/etc/skel", homedir])
     pmb.helpers.run.root(args, ["chown", "-R", "1000", homedir])
 
 
@@ -165,7 +171,8 @@ def copy_ssh_key(args):
     outfile.close()
 
     target = args.work + "/chroot_native/mnt/install/home/" + args.user + "/.ssh"
-    pmb.helpers.run.root(args, ["mkdir", target])
+    if False:
+        pmb.helpers.run.root(args, ["mkdir", target])
     pmb.helpers.run.root(args, ["chmod", "700", target])
     pmb.helpers.run.root(args, ["cp", authorized_keys, target + "/authorized_keys"])
     pmb.helpers.run.root(args, ["rm", authorized_keys])
@@ -196,8 +203,11 @@ def install_system_image(args):
     logging.info("*** (3/5) PREPARE INSTALL BLOCKDEVICE ***")
     pmb.chroot.shutdown(args, True)
     (size_image, size_boot) = get_subpartitions_size(args)
-    pmb.install.blockdevice.create(args, size_image)
-    pmb.install.partition(args, size_boot)
+    if False:
+        pmb.install.blockdevice.create(args, size_image)
+        pmb.install.partition(args, size_boot)
+    else:
+        pmb.install.partition(args, -1)
     if args.full_disk_encryption:
         logging.info("WARNING: Full disk encryption is enabled!")
         logging.info("Make sure that osk-sdl has been properly configured for your device")

@@ -63,24 +63,25 @@ def partition(args, size_boot):
 
     size_boot: size of the boot partition in bytes.
     """
-    # Convert to MB and print info
-    mb_boot = str(round(size_boot / 1024 / 1024)) + "M"
-    logging.info("(native) partition /dev/install (boot: " + mb_boot +
-                 ", root: the rest)")
+    if size_boot != -1:
+        # Convert to MB and print info
+        mb_boot = str(round(size_boot / 1024 / 1024)) + "M"
+        logging.info("(native) partition /dev/install (boot: " + mb_boot +
+                     ", root: the rest)")
 
-    # Actual partitioning with 'parted'. Using check=False, because parted
-    # sometimes "fails to inform the kernel". In case it really failed with
-    # partitioning, the follow-up mounting/formatting will not work, so it
-    # will stop there (see #463).
-    commands = [
-        ["mktable", "msdos"],
-        ["mkpart", "primary", "ext2", "2048s", mb_boot],
-        ["mkpart", "primary", mb_boot, "100%"],
-        ["set", "1", "boot", "on"]
-    ]
-    for command in commands:
-        pmb.chroot.root(args, ["parted", "-s", "/dev/install"] +
-                        command, check=False)
+        # Actual partitioning with 'parted'. Using check=False, because parted
+        # sometimes "fails to inform the kernel". In case it really failed with
+        # partitioning, the follow-up mounting/formatting will not work, so it
+        # will stop there (see #463).
+        commands = [
+            ["mktable", "msdos"],
+            ["mkpart", "primary", "ext2", "2048s", mb_boot],
+            ["mkpart", "primary", mb_boot, "100%"],
+            ["set", "1", "boot", "on"]
+        ]
+        for command in commands:
+            pmb.chroot.root(args, ["parted", "-s", "/dev/install"] +
+                            command, check=False)
 
     # Mount new partitions
     partitions_mount(args)

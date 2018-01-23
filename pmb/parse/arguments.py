@@ -266,6 +266,8 @@ def arguments():
                              " chroot and install to sdcard or image file")
     install.add_argument("--sdcard", help="path to the sdcard device,"
                          " eg. /dev/mmcblk0")
+    install.add_argument("--rsync", help="update the sdcard using rsync,"
+                         " only works with --no-fde", action="store_true", dest="rsync")
     install.add_argument("--cipher", help="cryptsetup cipher used to"
                          " encrypt the system partition, eg. aes-xts-plain64")
     install.add_argument("--iter-time", help="cryptsetup iteration time (in"
@@ -383,6 +385,8 @@ def arguments():
                             "built": {},
                             "find_aport": {}})
 
+    #setattr(args, "rsync", True)
+
     # Add and verify the deviceinfo (only after initialization)
     if args.action not in ("init", "config", "bootimg_analyze"):
         setattr(args, "deviceinfo", pmb.parse.deviceinfo(args))
@@ -395,5 +399,10 @@ def arguments():
                              " in build_device_architectures, zap your package cache"
                              " (otherwise you will have issues with noarch packages)"
                              " and try again.")
+    if args.rsync and args.full_disk_encryption:
+        raise ValueError("Installation using rsync is not compatible with full"
+                         " disk encryption.")
+    if args.rsync and not args.sdcard:
+        raise ValueError("Installation using rsync only works on sdcard.")
 
     return args

@@ -63,7 +63,7 @@ def partition(args, size_boot):
 
     size_boot: size of the boot partition in bytes.
     """
-    if size_boot != -1:
+    if not args.rsync:
         # Convert to MB and print info
         mb_boot = str(round(size_boot / 1024 / 1024)) + "M"
         logging.info("(native) partition /dev/install (boot: " + mb_boot +

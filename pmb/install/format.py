@@ -56,7 +56,7 @@ def format_and_mount_pm_crypt(args):
     mountpoint = "/mnt/install"
     logging.info("(native) format " + device + " (ext4), mount to " +
                  mountpoint)
-    if False:
+    if not args.rsync:
         pmb.chroot.root(args, ["mkfs.ext4", "-F", "-q", "-L", "pmOS_root", device])
     pmb.chroot.root(args, ["mkdir", "-p", mountpoint])
     pmb.chroot.root(args, ["mount", device, mountpoint])

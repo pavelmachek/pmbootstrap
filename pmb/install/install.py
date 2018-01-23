@@ -87,13 +87,12 @@ def copy_files_from_chroot(args):
         folders += [os.path.basename(path)]
 
     if not args.rsync:
-    # Run the copy command
+        # Run the copy command
         pmb.chroot.root(args, ["cp", "-a"] + folders + ["/mnt/install/"],
                         working_dir=mountpoint)
     else:
         pmb.chroot.root(args, ["rsync", "-avP", "--delete"] + folders + ["/mnt/install/"],
                         working_dir=mountpoint)
-        
 
 
 def copy_files_other(args):

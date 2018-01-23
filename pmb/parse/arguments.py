@@ -385,8 +385,6 @@ def arguments():
                             "built": {},
                             "find_aport": {}})
 
-    #setattr(args, "rsync", True)
-
     # Add and verify the deviceinfo (only after initialization)
     if args.action not in ("init", "config", "bootimg_analyze"):
         setattr(args, "deviceinfo", pmb.parse.deviceinfo(args))

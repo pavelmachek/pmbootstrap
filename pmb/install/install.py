@@ -95,6 +95,7 @@ def copy_files_from_chroot(args):
         pmb.chroot.root(args, ["cp", "-a"] + folders + ["/mnt/install/"],
                         working_dir=mountpoint)
 
+
 def copy_files_other(args):
     """
     Copy over keys, create /home/{user}.

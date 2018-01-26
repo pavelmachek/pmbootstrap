@@ -86,14 +86,14 @@ def copy_files_from_chroot(args):
             continue
         folders += [os.path.basename(path)]
 
-    if not args.rsync:
+    if args.rsync:
+        pmb.chroot.apk.install(args, ["rsync"])
+        pmb.chroot.root(args, ["rsync", "-avP", "--delete"] + folders + ["/mnt/install/"],
+                        working_dir=mountpoint)
+    else:
         # Run the copy command
         pmb.chroot.root(args, ["cp", "-a"] + folders + ["/mnt/install/"],
                         working_dir=mountpoint)
-    else:
-        pmb.chroot.root(args, ["rsync", "-avP", "--delete"] + folders + ["/mnt/install/"],
-                        working_dir=mountpoint)
-
 
 def copy_files_other(args):
     """
@@ -202,11 +202,12 @@ def install_system_image(args):
     logging.info("*** (3/5) PREPARE INSTALL BLOCKDEVICE ***")
     pmb.chroot.shutdown(args, True)
     (size_image, size_boot) = get_subpartitions_size(args)
-    if not args.rsync:
+    if args.rsync:
+        pmb.install.partition(args, -1)
+    else:
         pmb.install.blockdevice.create(args, size_image)
         pmb.install.partition(args, size_boot)
-    else:
-        pmb.install.partition(args, -1)
+
     if args.full_disk_encryption:
         logging.info("WARNING: Full disk encryption is enabled!")
         logging.info("Make sure that osk-sdl has been properly configured for your device")

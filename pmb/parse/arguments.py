@@ -398,11 +398,4 @@ def arguments():
                              " (otherwise you will have issues with noarch packages)"
                              " and try again.")
 
-    if args.action == "install":
-        if args.rsync and args.full_disk_encryption:
-            raise ValueError("Installation using rsync is not compatible with full"
-                             " disk encryption.")
-        if args.rsync and not args.sdcard:
-            raise ValueError("Installation using rsync only works on sdcard.")
-
     return args

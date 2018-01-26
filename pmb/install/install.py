@@ -202,11 +202,10 @@ def install_system_image(args):
     logging.info("*** (3/5) PREPARE INSTALL BLOCKDEVICE ***")
     pmb.chroot.shutdown(args, True)
     (size_image, size_boot) = get_subpartitions_size(args)
-    if args.rsync:
-        pmb.install.partition(args, -1)
-    else:
+    if not args.rsync:
         pmb.install.blockdevice.create(args, size_image)
         pmb.install.partition(args, size_boot)
+    pmb.install.partitions_mount(args)
 
     if args.full_disk_encryption:
         logging.info("WARNING: Full disk encryption is enabled!")

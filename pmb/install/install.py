@@ -107,9 +107,11 @@ def copy_files_other(args):
 
     # Create /home/{user}
     homedir = rootfs + "/home/" + args.user
-    if not args.rsync:
+    if args.rsync:
+        pmb.helpers.run.root(args, ["rsync", "-zavP", "--delete", rootfs + "/etc/skel", homedir])
+    else:
+        pmb.helpers.run.root(args, ["cp", "-a", rootfs + "/etc/skel", homedir])
         pmb.helpers.run.root(args, ["mkdir", rootfs + "/home"])
-    pmb.helpers.run.root(args, ["rsync", "-zavP", "--delete", rootfs + "/etc/skel", homedir])
     pmb.helpers.run.root(args, ["chown", "-R", "1000", homedir])
 
 

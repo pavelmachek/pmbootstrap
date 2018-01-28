@@ -86,12 +86,16 @@ def copy_files_from_chroot(args):
             continue
         folders += [os.path.basename(path)]
 
+    # Update or copy all files
     if args.rsync:
         pmb.chroot.apk.install(args, ["rsync"])
-        pmb.chroot.root(args, ["rsync", "-avP", "--delete"] + folders + ["/mnt/install/"],
+        rsync_flags = "-a"
+        if args.verbose:
+            rsync_flags += "vP"
+        pmb.chroot.root(args, ["rsync", rsync_flags, "--delete"] + folders + ["/mnt/install/"],
                         working_dir=mountpoint)
+        pmb.chroot.root(args, ["rm", "-rf", "/mnt/install/home"])
     else:
-        # Run the copy command
         pmb.chroot.root(args, ["cp", "-a"] + folders + ["/mnt/install/"],
                         working_dir=mountpoint)
 
@@ -105,13 +109,10 @@ def copy_files_other(args):
     for key in glob.glob(args.work + "/config_apk_keys/*.pub"):
         pmb.helpers.run.root(args, ["cp", key, rootfs + "/etc/apk/keys/"])
 
-    # Create /home/{user}
+    # Create /home/{user} from /etc/skel
     homedir = rootfs + "/home/" + args.user
-    if args.rsync:
-        pmb.helpers.run.root(args, ["rsync", "-zavP", "--delete", rootfs + "/etc/skel", homedir])
-    else:
-        pmb.helpers.run.root(args, ["cp", "-a", rootfs + "/etc/skel", homedir])
-        pmb.helpers.run.root(args, ["mkdir", rootfs + "/home"])
+    pmb.helpers.run.root(args, ["mkdir", rootfs + "/home"])
+    pmb.helpers.run.root(args, ["cp", "-a", rootfs + "/etc/skel", homedir])
     pmb.helpers.run.root(args, ["chown", "-R", "1000", homedir])
 
 
@@ -173,8 +174,7 @@ def copy_ssh_key(args):
     outfile.close()
 
     target = args.work + "/chroot_native/mnt/install/home/" + args.user + "/.ssh"
-    if not args.rsync:
-        pmb.helpers.run.root(args, ["mkdir", target])
+    pmb.helpers.run.root(args, ["mkdir", target])
     pmb.helpers.run.root(args, ["chmod", "700", target])
     pmb.helpers.run.root(args, ["cp", authorized_keys, target + "/authorized_keys"])
     pmb.helpers.run.root(args, ["rm", authorized_keys])

@@ -71,7 +71,7 @@ weston() {
 }
 
 x11() {
-        install_if="$pkgname xorg-server"
+	install_if="$pkgname xorg-server"
 	install -D -m644 "$srcdir"/40-xkb.conf \
 		"$subpkgdir"/etc/X11/xorg.conf.d/40-xkb.conf
 }

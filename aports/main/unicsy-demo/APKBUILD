@@ -1,11 +1,12 @@
 pkgname=unicsy-demo
-pkgver=0.4
-pkgrel=0
+pkgver=0.4.1
+pkgrel=3
 pkgdesc="Phone hardware demo (battery status, light sensors, accelerometer, LEDs, backlights)"
 url="https://github.com/pavelmachek/unicsy_demo"
 arch="noarch"
 license="GPL3"
-depends="python2 py-gtk-dev py-dbus"
+depends="python2 py-gtk-dev py-dbus mate-terminal xscreensaver pulseaudio alsa-utils bash xmessage"
+# Would really like: mplayer evdev-python -- investigate!
 makedepends=""
 subpackages=""
 
@@ -18,7 +19,8 @@ package() {
     install -d -m755 "$pkgdir"/usr/bin
     cp -a "${srcdir}/unicsy_demo-${pkgver}"/* "$pkgdir"/usr/share/unicsy/
     ln -s /usr/share/unicsy/demo/demo.py "$pkgdir"/usr/bin/unicsy_demo
+    ln -s /usr/share/unicsy/demo/demo.py "$pkgdir"/usr/bin/demo
     install -D -m755 "$srcdir/unicsy_demo-${pkgver}"/startup/unicsy_demo.desktop \
 		     "$pkgdir"/etc/xdg/autostart/unicsy_demo.desktop
 }
-sha512sums="b916a745a0dd771525a6fbc06eef7dc443073ea2a09369c1d1a32d01b931161936ce471b4642a95b3e36cd39d22bb5df60f08fd9f1f3403b1173d33a0fc059a9  unicsy-demo-0.4.tar.gz"
+sha512sums="bd16badfff81a92f711a1e207e00dca5524e116bf3d88391ab2221f104092c47dcaa9565a5ba0a6b1b36530f755ed76895953d455e8751a026ed371b1948fc48  unicsy-demo-0.4.1.tar.gz"

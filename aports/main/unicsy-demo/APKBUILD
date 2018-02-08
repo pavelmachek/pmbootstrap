@@ -1,5 +1,5 @@
 pkgname=unicsy-demo
-pkgver=0.4.2
+pkgver=0.4.5
 pkgrel=0
 pkgdesc="Phone hardware demo (battery status, light sensors, accelerometer, LEDs, backlights)"
 url="https://github.com/pavelmachek/unicsy_demo"
@@ -21,7 +21,7 @@ package() {
     ln -s /usr/share/unicsy/demo/demo.py "$pkgdir"/usr/bin/unicsy_demo
     install -D -m755 "$srcdir/unicsy_demo-${pkgver}"/startup/unicsy_demo.desktop \
 		     "$pkgdir"/etc/xdg/autostart/unicsy_demo.desktop
-    install -D -m755 "$srcdir/unicsy_demo-${pkgver}"/startup/phone.sudoers \
-		     "$pkgdir"/etc/sudoers.d/phone"
+    install -D -m440 "$srcdir/unicsy_demo-${pkgver}"/startup/phone.sudoers \
+		     "$pkgdir"/etc/sudoers.d/phone
 }
-sha512sums="bd16badfff81a92f711a1e207e00dca5524e116bf3d88391ab2221f104092c47dcaa9565a5ba0a6b1b36530f755ed76895953d455e8751a026ed371b1948fc48  unicsy-demo-0.4.2.tar.gz"
+sha512sums="5795b5d4cf9bc0601325cd8ab966278d6754087d1e39512ac908ef993982dd86abf5c56fe16a3f4c031328562eee4e4949da1e9a9f1436effe30ee202675a5e7  unicsy-demo-0.4.5.tar.gz"

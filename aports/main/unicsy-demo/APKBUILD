@@ -6,15 +6,11 @@ url="https://github.com/pavelmachek/unicsy_demo"
 arch="noarch"
 license="GPL3"
 depends="python2 py-gtk-dev py-dbus mate-terminal xscreensaver pulseaudio alsa-utils bash xmessage"
-# Would really like: mplayer evdev-python -- investigate!
 makedepends=""
 subpackages=""
 
 # For releases
 source="${pkgname}-${pkgver}.tar.gz::https://github.com/pavelmachek/unicsy_demo/archive/${pkgver}.tar.gz"
-# For development
-#source="${pkgname}-${pkgver}.tar.gz::https://api.github.com/repos/pavelmachek/unicsy_demo/tarball/master"
-#source="${pkgname}-${pkgver}.tar.gz::https://api.github.com/repos/pavelmachek/unicsy_demo/tarball/7b3e75f6b5aa3de7f682e213b353c8dca545a6eb"
 
 options="!strip"
 
